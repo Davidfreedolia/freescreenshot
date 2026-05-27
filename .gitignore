@@ -1,0 +1,51 @@
+# Build artifacts
+bin/
+obj/
+out/
+publish/
+*.user
+*.suo
+
+# Visual Studio
+.vs/
+*.userosscache
+*.sln.docstates
+*.VC.db
+*.VC.opendb
+
+# Rider
+.idea/
+*.DotSettings.user
+
+# VS Code (keep settings shared if any)
+.vscode/*
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs and temp
+*.log
+*.tmp
+*.swp
+TestResults/
+
+# Local environment
+.env
+.env.local
+appsettings.Development.json
+
+# Packaged outputs
+*.msi
+*.zip
+!brand/**/*.zip
+
+# NuGet
+*.nupkg
+packages/
+.nuget/

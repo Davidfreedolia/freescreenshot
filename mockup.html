@@ -1,0 +1,937 @@
+<!doctype html>
+<html lang="ca">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>FreeScreenshot — Mockup</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg-base: #1A1814;
+    --surface-1: #25221E;
+    --surface-2: #2F2C27;
+    --surface-3: #3A3631;
+    --border-subtle: #3A3631;
+    --border-strong: #524C44;
+    --text-primary: #F5F2EC;
+    --text-secondary: #A8A39B;
+    --text-muted: #6B6760;
+    --text-disabled: #4A4640;
+    --accent: #A3E635;
+    --accent-hover: #BEF264;
+    --accent-pressed: #84CC16;
+    --accent-soft: #A3E63520;
+    --warning: #FBBF24;
+    --error: #F87171;
+
+    --shadow-sm: 0 1px 2px rgba(26, 24, 20, 0.4);
+    --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.35), 0 1px 2px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 12px 32px rgba(0, 0, 0, 0.45), 0 2px 6px rgba(0, 0, 0, 0.25);
+    --shadow-xl: 0 24px 60px rgba(0, 0, 0, 0.55), 0 4px 12px rgba(0, 0, 0, 0.35);
+    --ring: 0 0 0 3px rgba(163, 230, 53, 0.28);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-xl: 20px;
+
+    --ease: cubic-bezier(0.32, 0.72, 0, 1);
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    font-family: Inter, "Segoe UI Variable", "Segoe UI", system-ui, sans-serif;
+    color: var(--text-primary);
+    background: #0F0E0C;
+    -webkit-font-smoothing: antialiased;
+  }
+  .mono { font-family: "JetBrains Mono", Consolas, monospace; font-weight: 500; }
+
+  /* Page chrome */
+  .page {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+  .page-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; gap: 16px; flex-wrap: wrap;
+  }
+  .brand { display: flex; align-items: center; gap: 12px; }
+  .brand-text { font-size: 18px; font-weight: 600; letter-spacing: -0.3px; }
+  .brand-sub { color: var(--text-muted); font-size: 12px; }
+
+  .scene-tabs {
+    display: flex; gap: 4px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    padding: 4px;
+    border-radius: var(--radius-md);
+    flex-wrap: wrap;
+  }
+  .scene-tab {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 0;
+    padding: 8px 14px;
+    font: inherit; font-size: 13px; font-weight: 500;
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: all 120ms ease-out;
+  }
+  .scene-tab:hover { color: var(--text-primary); background: var(--surface-2); }
+  .scene-tab.active { background: var(--accent); color: #1A1814; }
+
+  /* Stage */
+  .stage {
+    position: relative;
+    background:
+      linear-gradient(135deg, #2c2823 0%, #1a1814 100%);
+    border-radius: var(--radius-xl);
+    border: 1px solid var(--border-subtle);
+    overflow: hidden;
+    min-height: 640px;
+    box-shadow: var(--shadow-xl);
+  }
+  .scene { display: none; height: 100%; }
+  .scene.active { display: block; }
+
+  /* Fake desktop wallpaper */
+  .desktop {
+    position: absolute; inset: 0;
+    background:
+      radial-gradient(at 20% 30%, #3a3934 0%, transparent 50%),
+      radial-gradient(at 80% 70%, #2e2a24 0%, transparent 50%),
+      linear-gradient(180deg, #1f1d19 0%, #14130f 100%);
+  }
+  .fake-window {
+    position: absolute;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .fake-window .titlebar {
+    height: 32px;
+    background: var(--surface-2);
+    display: flex; align-items: center; padding: 0 12px;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-subtle);
+  }
+  .fake-window .titlebar .dot {
+    width: 10px; height: 10px; border-radius: 50%;
+    background: var(--surface-3);
+  }
+  .fake-window .body {
+    padding: 16px;
+    color: var(--text-secondary);
+    font-size: 13px;
+  }
+  .fake-window .body h3 { margin: 0 0 8px; color: var(--text-primary); font-size: 14px; font-weight: 600; }
+
+  /* ---- SCENE 1: Selection overlay ---- */
+  .dim {
+    position: absolute; inset: 0;
+    background: rgba(15, 14, 12, 0.55);
+    -webkit-backdrop-filter: blur(0.5px);
+            backdrop-filter: blur(0.5px);
+    pointer-events: none;
+  }
+  .selection {
+    position: absolute;
+    border: 1px solid var(--accent);
+    box-shadow: 0 0 0 9999px transparent;
+    background: transparent;
+    /* "cut out" effect via two overlays */
+  }
+  .selection .handle {
+    position: absolute; width: 8px; height: 8px;
+    background: var(--accent);
+  }
+  .selection .handle.tl { top: -4px; left: -4px; }
+  .selection .handle.tr { top: -4px; right: -4px; }
+  .selection .handle.bl { bottom: -4px; left: -4px; }
+  .selection .handle.br { bottom: -4px; right: -4px; }
+  .selection .handle.t  { top: -4px; left: 50%; transform: translateX(-50%); }
+  .selection .handle.b  { bottom: -4px; left: 50%; transform: translateX(-50%); }
+  .selection .handle.l  { top: 50%; left: -4px; transform: translateY(-50%); }
+  .selection .handle.r  { top: 50%; right: -4px; transform: translateY(-50%); }
+  .dim-cut {
+    /* The cut-out portion: we don't actually cut, we use 4 dim rectangles */
+  }
+  .dim-piece {
+    position: absolute; background: rgba(15, 14, 12, 0.62);
+    pointer-events: none;
+  }
+  .dim-cross {
+    position: absolute; pointer-events: none;
+    color: rgba(245, 242, 236, 0.45);
+    font-size: 11px;
+  }
+  .dim-cross .vline, .dim-cross .hline {
+    position: absolute; background: rgba(245, 242, 236, 0.18);
+  }
+  .dim-cross .vline { width: 1px; top: 0; bottom: 0; }
+  .dim-cross .hline { height: 1px; left: 0; right: 0; }
+
+  .size-pill {
+    position: absolute;
+    background: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    padding: 6px 10px;
+    border-radius: var(--radius-sm);
+    box-shadow: var(--shadow-md);
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .size-pill .x { color: var(--text-muted); margin: 0 4px; }
+
+  .hint-strip {
+    position: absolute;
+    top: 24px; left: 50%; transform: translateX(-50%);
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-full, 9999px);
+    padding: 8px 16px;
+    color: var(--text-secondary);
+    font-size: 12px;
+    box-shadow: var(--shadow-md);
+    border-radius: 9999px;
+  }
+  .kbd {
+    display: inline-block;
+    padding: 1px 6px;
+    border-radius: 4px;
+    background: var(--surface-3);
+    border: 1px solid var(--border-strong);
+    color: var(--text-primary);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 11px;
+    margin: 0 2px;
+  }
+
+  /* ---- Floating toolbar (after selection) ---- */
+  .float-toolbar {
+    position: absolute;
+    display: flex;
+    gap: 2px;
+    background: rgba(37, 34, 30, 0.95);
+    -webkit-backdrop-filter: blur(20px) saturate(140%);
+            backdrop-filter: blur(20px) saturate(140%);
+    border: 1px solid var(--border-strong);
+    border-radius: 9999px;
+    padding: 6px;
+    box-shadow: var(--shadow-lg);
+  }
+  .float-toolbar .ico-btn {
+    width: 36px; height: 36px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: 9999px;
+    background: transparent; color: var(--text-secondary);
+    border: 0; cursor: pointer;
+    transition: all 120ms ease-out;
+  }
+  .float-toolbar .ico-btn:hover { background: var(--surface-3); color: var(--text-primary); }
+  .float-toolbar .ico-btn.primary { background: var(--accent); color: #1A1814; }
+  .float-toolbar .ico-btn.primary:hover { background: var(--accent-hover); }
+  .float-toolbar .divider {
+    width: 1px; background: var(--border-strong); margin: 6px 4px;
+  }
+
+  /* ---- SCENE 2: Editor ---- */
+  .editor {
+    position: absolute;
+    inset: 24px;
+    background: var(--surface-1);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-subtle);
+    display: grid;
+    grid-template-rows: 48px 1fr 36px;
+    grid-template-columns: 56px 1fr;
+    grid-template-areas:
+      "top  top"
+      "side canvas"
+      "foot foot";
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .editor .top {
+    grid-area: top;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    border-bottom: 1px solid var(--border-subtle);
+    background: var(--surface-1);
+  }
+  .editor .top .group { display: flex; align-items: center; gap: 8px; }
+  .editor .top .title { font-size: 13px; color: var(--text-secondary); }
+  .editor .top .title strong { color: var(--text-primary); }
+
+  .editor .side {
+    grid-area: side;
+    border-right: 1px solid var(--border-subtle);
+    padding: 8px 6px;
+    display: flex; flex-direction: column; gap: 4px;
+    background: var(--surface-1);
+  }
+  .tool-btn {
+    width: 44px; height: 40px;
+    display: inline-flex; align-items: center; justify-content: center;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    color: var(--text-secondary);
+    border: 0; cursor: pointer;
+    transition: all 120ms ease-out;
+  }
+  .tool-btn:hover { background: var(--surface-2); color: var(--text-primary); }
+  .tool-btn.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(163, 230, 53, 0.4);
+  }
+  .tool-sep { height: 1px; background: var(--border-subtle); margin: 4px 6px; }
+
+  .editor .canvas {
+    grid-area: canvas;
+    background:
+      repeating-conic-gradient(#1d1b17 0% 25%, #211e1a 0% 50%) 50% / 22px 22px;
+    position: relative;
+    overflow: hidden;
+  }
+  .shot {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    width: 64%; aspect-ratio: 16 / 10;
+    background: linear-gradient(135deg, #4d6ad6 0%, #6b8df0 100%);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+  }
+  .shot .content {
+    position: absolute; inset: 12%;
+    background: rgba(255,255,255,0.08);
+    border-radius: 8px;
+    border: 1px solid rgba(255,255,255,0.18);
+    padding: 16px;
+    color: rgba(255,255,255,0.92);
+    font-size: 12px;
+  }
+  .anno-arrow {
+    position: absolute;
+    width: 90px; height: 60px;
+  }
+  .anno-num {
+    position: absolute;
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #1A1814;
+    font-size: 13px; font-weight: 700;
+    display: inline-flex; align-items: center; justify-content: center;
+    box-shadow: var(--shadow-sm);
+  }
+  .anno-rect {
+    position: absolute;
+    border: 2px solid var(--accent);
+    border-radius: 4px;
+    pointer-events: none;
+  }
+
+  .editor .foot {
+    grid-area: foot;
+    border-top: 1px solid var(--border-subtle);
+    background: var(--surface-1);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    color: var(--text-muted); font-size: 12px;
+  }
+  .editor .foot .group { display: flex; gap: 12px; align-items: center; }
+  .editor .foot .dot-sep { color: var(--text-disabled); }
+
+  /* Buttons */
+  .btn {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 0 16px; height: 36px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-2);
+    color: var(--text-primary);
+    font: inherit; font-size: 13px; font-weight: 500;
+    cursor: pointer;
+    transition: all 120ms ease-out;
+  }
+  .btn:hover { background: var(--surface-3); }
+  .btn.primary { background: var(--accent); color: #1A1814; border-color: transparent; }
+  .btn.primary:hover { background: var(--accent-hover); }
+  .btn.ghost { background: transparent; border-color: transparent; color: var(--text-secondary); }
+  .btn.ghost:hover { background: var(--surface-2); color: var(--text-primary); }
+  .btn.sm { height: 28px; padding: 0 12px; font-size: 12px; }
+  .btn .ico { width: 16px; height: 16px; }
+
+  /* ---- SCENE 3: Tray menu ---- */
+  .tray-bar {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 48px;
+    background: rgba(15, 14, 12, 0.95);
+    -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+    border-top: 1px solid var(--border-subtle);
+    display: flex; align-items: center; justify-content: flex-end;
+    padding: 0 16px; gap: 12px;
+    z-index: 5;
+  }
+  .tray-icon {
+    width: 28px; height: 28px;
+    display: inline-flex; align-items: center; justify-content: center;
+    color: var(--accent);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .tray-icon:hover { background: var(--surface-2); }
+  .tray-clock {
+    font-size: 12px; color: var(--text-secondary);
+    font-family: "JetBrains Mono", monospace;
+  }
+  .tray-menu {
+    position: absolute;
+    right: 100px; bottom: 60px;
+    width: 260px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-strong);
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-xl);
+    padding: 6px;
+    z-index: 6;
+  }
+  .menu-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    color: var(--text-primary);
+    font-size: 13px;
+    cursor: pointer;
+    transition: background 120ms ease-out;
+  }
+  .menu-item:hover { background: var(--surface-2); }
+  .menu-item .left { display: flex; align-items: center; gap: 10px; }
+  .menu-item .ico { color: var(--text-secondary); }
+  .menu-item:hover .ico { color: var(--text-primary); }
+  .menu-item .shortcut {
+    color: var(--text-muted); font-size: 11px;
+    font-family: "JetBrains Mono", monospace;
+  }
+  .menu-sep { height: 1px; background: var(--border-subtle); margin: 6px 4px; }
+  .menu-head {
+    padding: 10px 12px 6px;
+    font-size: 11px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  /* ---- SCENE 4: Settings ---- */
+  .settings {
+    position: absolute;
+    inset: 48px;
+    background: var(--surface-1);
+    border: 1px solid var(--border-subtle);
+    border-radius: var(--radius-lg);
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+  }
+  .settings .nav {
+    border-right: 1px solid var(--border-subtle);
+    padding: 16px 8px;
+    display: flex; flex-direction: column; gap: 2px;
+  }
+  .nav-item {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 13px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    display: flex; align-items: center; gap: 10px;
+    transition: all 120ms ease-out;
+  }
+  .nav-item:hover { background: var(--surface-2); color: var(--text-primary); }
+  .nav-item.active {
+    background: var(--accent-soft);
+    color: var(--accent);
+    box-shadow: inset 0 0 0 1px rgba(163, 230, 53, 0.4);
+  }
+  .settings .content {
+    padding: 28px 32px;
+    overflow: auto;
+  }
+  .settings h2 {
+    margin: 0 0 6px;
+    font-size: 22px; font-weight: 600; letter-spacing: -0.3px;
+  }
+  .settings .sub {
+    color: var(--text-secondary);
+    font-size: 13px;
+    margin-bottom: 24px;
+  }
+  .row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--border-subtle);
+    gap: 24px;
+  }
+  .row:last-child { border-bottom: 0; }
+  .row .label { font-size: 13px; color: var(--text-primary); font-weight: 500; }
+  .row .desc { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+  .input {
+    background: var(--surface-2);
+    border: 1px solid var(--border-subtle);
+    color: var(--text-primary);
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    font: inherit; font-size: 13px;
+    min-width: 240px;
+  }
+  .input:focus { outline: none; border-color: var(--accent); box-shadow: var(--ring); }
+
+  .toggle {
+    width: 36px; height: 22px; border-radius: 9999px;
+    background: var(--surface-3);
+    position: relative; cursor: pointer;
+    transition: background 160ms ease-out;
+  }
+  .toggle::after {
+    content: "";
+    position: absolute; top: 3px; left: 3px;
+    width: 16px; height: 16px; border-radius: 50%;
+    background: var(--text-secondary);
+    transition: all 160ms var(--ease);
+  }
+  .toggle.on { background: var(--accent); }
+  .toggle.on::after { left: 17px; background: #1A1814; }
+
+  .kbd-row { display: flex; gap: 4px; align-items: center; }
+
+  /* Footer note */
+  .foot-note {
+    text-align: center;
+    margin-top: 20px;
+    color: var(--text-muted);
+    font-size: 12px;
+  }
+
+  /* Wordmark mini */
+  .wm {
+    display: inline-flex; align-items: center; gap: 10px;
+  }
+  .wm-mark { position: relative; width: 28px; height: 28px; }
+  .wm-mark svg { width: 100%; height: 100%; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="page-header">
+    <div class="brand">
+      <span class="wm">
+        <span class="wm-mark">
+          <svg viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <rect width="64" height="64" rx="14" fill="#1A1814"/>
+            <g stroke="#A3E635" stroke-width="3.5" stroke-linecap="square" fill="none">
+              <path d="M 16 24 L 16 14 L 26 14"/>
+              <path d="M 48 40 L 48 50 L 38 50"/>
+            </g>
+            <circle cx="32" cy="32" r="3" fill="#A3E635"/>
+          </svg>
+        </span>
+        <span>
+          <div class="brand-text">freescreenshot</div>
+          <div class="brand-sub">by freedolia · mockup v0.1</div>
+        </span>
+      </span>
+    </div>
+    <div class="scene-tabs" id="tabs">
+      <button class="scene-tab active" data-scene="selection">Selecció</button>
+      <button class="scene-tab" data-scene="editor">Editor</button>
+      <button class="scene-tab" data-scene="tray">Safata</button>
+      <button class="scene-tab" data-scene="settings">Configuració</button>
+    </div>
+  </div>
+
+  <div class="stage">
+
+    <!-- SCENE 1: Selection -->
+    <div class="scene active" data-scene="selection">
+      <div class="desktop"></div>
+      <!-- Fake apps in the background to make the selection meaningful -->
+      <div class="fake-window" style="top:60px; left:80px; width:360px; height:220px;">
+        <div class="titlebar"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="body">
+          <h3>Notes</h3>
+          <p>Llista de la compra<br/>· Pa<br/>· Llet<br/>· Tomàquets</p>
+        </div>
+      </div>
+      <div class="fake-window" style="top:120px; left:520px; width:480px; height:300px;">
+        <div class="titlebar"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="body">
+          <h3>Quadre de comandament</h3>
+          <p style="color: var(--text-muted);">Vendes setmana 21 — 12.408 €</p>
+          <div style="margin-top:12px; height: 120px; background: linear-gradient(180deg, rgba(163,230,53,0.15), transparent); border-radius: 8px; border: 1px solid var(--border-subtle); position:relative;">
+            <svg viewBox="0 0 400 120" style="width:100%; height:100%;">
+              <polyline points="0,90 50,80 100,75 150,60 200,50 250,55 300,30 350,25 400,15" fill="none" stroke="#A3E635" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dim pieces around the selection box (252,180) → (632,420) -->
+      <div class="dim-piece" style="top:0; left:0; right:0; height:180px;"></div>
+      <div class="dim-piece" style="top:420px; left:0; right:0; bottom:0;"></div>
+      <div class="dim-piece" style="top:180px; left:0; width:252px; height:240px;"></div>
+      <div class="dim-piece" style="top:180px; left:632px; right:0; height:240px;"></div>
+
+      <!-- Selection box -->
+      <div class="selection" style="top:180px; left:252px; width:380px; height:240px;">
+        <span class="handle tl"></span><span class="handle tr"></span>
+        <span class="handle bl"></span><span class="handle br"></span>
+        <span class="handle t"></span><span class="handle b"></span>
+        <span class="handle l"></span><span class="handle r"></span>
+      </div>
+
+      <!-- Size pill -->
+      <div class="size-pill mono" style="top:430px; left:252px;">
+        380 <span class="x">×</span> 240
+      </div>
+
+      <!-- Hint -->
+      <div class="hint-strip">
+        Arrossega per seleccionar. <span class="kbd">Esc</span> per cancel·lar.
+      </div>
+
+      <!-- Floating toolbar (just below selection) -->
+      <div class="float-toolbar" style="top:444px; left:280px;">
+        <button class="ico-btn" title="Editor · Espai">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+        </button>
+        <button class="ico-btn" title="Fixar · P">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="17" x2="12" y2="22"/><path d="M5 17h14l-1.5-2.5V10a5.5 5.5 0 0 0-11 0v4.5L5 17z"/></svg>
+        </button>
+        <button class="ico-btn" title="OCR · T">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg>
+        </button>
+        <button class="ico-btn" title="Pujar · U">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </button>
+        <div class="divider"></div>
+        <button class="ico-btn" title="Desar · Ctrl+S">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        </button>
+        <button class="ico-btn primary" title="Copiar · Enter">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- SCENE 2: Editor -->
+    <div class="scene" data-scene="editor">
+      <div class="desktop"></div>
+      <div class="editor">
+        <!-- Top -->
+        <div class="top">
+          <div class="group">
+            <button class="btn ghost sm" title="Desfer · Ctrl+Z">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 0 0-15-6.7L3 13"/></svg>
+            </button>
+            <button class="btn ghost sm" title="Refer · Ctrl+Y">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 0 1 15-6.7L21 13"/></svg>
+            </button>
+            <span style="width:1px; height:20px; background: var(--border-subtle); margin: 0 6px;"></span>
+            <span class="title"><strong>captura_001.png</strong> · sense desar</span>
+          </div>
+          <div class="group">
+            <button class="btn ghost sm">Desar com a…</button>
+            <button class="btn ghost sm">Pujar</button>
+            <button class="btn primary sm">
+              <svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
+            </button>
+          </div>
+        </div>
+        <!-- Sidebar -->
+        <div class="side">
+          <button class="tool-btn" title="Selecció"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m9 9 5 12 1.8-5.2L21 14Z"/><path d="M7.2 2.2 8 5.1"/><path d="m5.1 8-2.9-.8"/><path d="M14 4.1 12 6"/><path d="m6 12-1.9 2"/></svg></button>
+          <button class="tool-btn" title="Retallar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg></button>
+          <div class="tool-sep"></div>
+          <button class="tool-btn active" title="Fletxa"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></button>
+          <button class="tool-btn" title="Rectangle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/></svg></button>
+          <button class="tool-btn" title="Cercle"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/></svg></button>
+          <button class="tool-btn" title="Línia"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"><line x1="5" y1="19" x2="19" y2="5"/></svg></button>
+          <button class="tool-btn" title="Text"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 7 4 4 20 4 20 7"/><line x1="9" y1="20" x2="15" y2="20"/><line x1="12" y1="4" x2="12" y2="20"/></svg></button>
+          <button class="tool-btn" title="Numerar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><text x="12" y="16" text-anchor="middle" font-size="11" font-family="Inter" font-weight="700" fill="currentColor" stroke="none">1</text></svg></button>
+          <div class="tool-sep"></div>
+          <button class="tool-btn" title="Difuminar"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3v18"/></svg></button>
+          <button class="tool-btn" title="Llapis"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg></button>
+          <button class="tool-btn" title="Goma"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="m7 21-4.3-4.3a1 1 0 0 1 0-1.4l9.6-9.6a1 1 0 0 1 1.4 0l5.6 5.6a1 1 0 0 1 0 1.4L13 21"/><path d="M22 21H7"/><path d="m5 11 9 9"/></svg></button>
+        </div>
+        <!-- Canvas -->
+        <div class="canvas">
+          <div class="shot">
+            <div class="content">
+              <div style="font-size:11px; opacity:0.7;">Quadre de comandament · Vendes</div>
+              <div style="font-size:20px; font-weight:700; margin-top:6px;">12.408 €</div>
+              <div style="font-size:11px; opacity:0.65; margin-top:2px;">Setmana 21 · +18 % vs setmana anterior</div>
+              <div style="margin-top:14px; height: 60%; background: rgba(255,255,255,0.08); border-radius:6px; position:relative;">
+                <svg viewBox="0 0 400 120" preserveAspectRatio="none" style="width:100%; height:100%;">
+                  <polyline points="0,90 50,80 100,75 150,60 200,50 250,55 300,30 350,25 400,15" fill="none" stroke="rgba(255,255,255,0.85)" stroke-width="2"/>
+                </svg>
+              </div>
+            </div>
+            <!-- Annotations -->
+            <div class="anno-rect" style="top:18%; left:42%; width:36%; height:18%;"></div>
+            <div class="anno-num" style="top:14%; left:38%;">1</div>
+            <svg class="anno-arrow" style="top:38%; left:6%;" viewBox="0 0 90 60">
+              <defs>
+                <marker id="arr" markerWidth="10" markerHeight="10" refX="6" refY="5" orient="auto">
+                  <path d="M0,0 L8,5 L0,10 z" fill="#A3E635"/>
+                </marker>
+              </defs>
+              <path d="M 5 55 Q 30 10 80 20" stroke="#A3E635" stroke-width="3" fill="none" marker-end="url(#arr)"/>
+            </svg>
+            <div class="anno-num" style="top:62%; left:2%;">2</div>
+          </div>
+        </div>
+        <!-- Foot -->
+        <div class="foot">
+          <div class="group">
+            <span class="mono">1280 × 720</span><span class="dot-sep">·</span>
+            <span>PNG</span><span class="dot-sep">·</span>
+            <span class="mono">184 KB</span>
+          </div>
+          <div class="group">
+            <span class="mono">100 %</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 3: Tray -->
+    <div class="scene" data-scene="tray">
+      <div class="desktop"></div>
+      <!-- Some fake apps to make taskbar context realistic -->
+      <div class="fake-window" style="top:80px; left:120px; width:520px; height:340px;">
+        <div class="titlebar"><div class="dot"></div><div class="dot"></div><div class="dot"></div></div>
+        <div class="body">
+          <h3>Treballant en alguna cosa…</h3>
+          <p style="color: var(--text-muted);">Mentre treballes, FreeScreenshot espera a la safata.</p>
+        </div>
+      </div>
+
+      <!-- Tray bar (Windows taskbar bottom) -->
+      <div class="tray-bar">
+        <div class="tray-icon" title="freescreenshot">
+          <svg width="20" height="20" viewBox="0 0 64 64" xmlns="http://www.w3.org/2000/svg">
+            <g stroke="#A3E635" stroke-width="5" stroke-linecap="square" fill="none">
+              <path d="M 16 24 L 16 14 L 26 14"/>
+              <path d="M 48 40 L 48 50 L 38 50"/>
+            </g>
+            <circle cx="32" cy="32" r="4" fill="#A3E635"/>
+          </svg>
+        </div>
+        <div class="tray-clock">14:32 · 27/05</div>
+      </div>
+
+      <!-- Tray menu popup -->
+      <div class="tray-menu">
+        <div class="menu-head">Capturar</div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            </span>
+            Capturar àrea
+          </div>
+          <div class="shortcut">Ctrl+Shift+1</div>
+        </div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="14" rx="2"/><path d="M2 22h20"/></svg>
+            </span>
+            Capturar finestra
+          </div>
+          <div class="shortcut">Ctrl+Shift+2</div>
+        </div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+            </span>
+            Pantalla sencera
+          </div>
+          <div class="shortcut">Ctrl+Shift+3</div>
+        </div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
+            Captura amb scroll
+          </div>
+          <div class="shortcut">Ctrl+Shift+4</div>
+        </div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+            </span>
+            Gravar pantalla
+          </div>
+          <div class="shortcut">Ctrl+Shift+5</div>
+        </div>
+        <div class="menu-sep"></div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </span>
+            Historial
+          </div>
+          <div class="shortcut">Ctrl+Shift+H</div>
+        </div>
+        <div class="menu-item">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+            </span>
+            Configuració
+          </div>
+          <div class="shortcut">Ctrl+,</div>
+        </div>
+        <div class="menu-sep"></div>
+        <div class="menu-item" style="color: var(--text-secondary);">
+          <div class="left">
+            <span class="ico">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            </span>
+            Sortir
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SCENE 4: Settings -->
+    <div class="scene" data-scene="settings">
+      <div class="desktop"></div>
+      <div class="settings">
+        <div class="nav">
+          <div class="nav-item active">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33"/></svg>
+            General
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M6 8h.01M10 8h.01M14 8h.01M18 8h.01M6 12h.01M10 12h.01M14 12h.01M18 12h.01M7 16h10"/></svg>
+            Dreceres
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></svg>
+            Captura
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>
+            Editor
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Sortida
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19a4.5 4.5 0 1 0 0-9h-1.8A7 7 0 1 0 5 16.2"/></svg>
+            Núvol
+          </div>
+          <div class="nav-item">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Quant a
+          </div>
+        </div>
+        <div class="content">
+          <h2>General</h2>
+          <p class="sub">Comportament de l'app a Windows.</p>
+
+          <div class="row">
+            <div>
+              <div class="label">Iniciar amb Windows</div>
+              <div class="desc">L'app arrenca a la safata quan inicies sessió.</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Mostrar a la safata</div>
+              <div class="desc">Icona prop del rellotge per accés ràpid.</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Mode</div>
+              <div class="desc">Aparença de l'app.</div>
+            </div>
+            <select class="input">
+              <option>Sistema</option>
+              <option selected>Fosc</option>
+              <option>Clar</option>
+            </select>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Llengua</div>
+              <div class="desc">Idioma de la interfície.</div>
+            </div>
+            <select class="input">
+              <option selected>Català</option>
+              <option>English</option>
+              <option>Español</option>
+            </select>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">So d'obturador</div>
+              <div class="desc">Reproduir un clic en fer la captura.</div>
+            </div>
+            <div class="toggle"></div>
+          </div>
+          <div class="row">
+            <div>
+              <div class="label">Copiar després de capturar</div>
+              <div class="desc">Posa la captura al portapapers automàticament.</div>
+            </div>
+            <div class="toggle on"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="foot-note">
+    Premsa les pestanyes de dalt per veure cada escena · Disseny v0.1 · No vinculant
+  </div>
+</div>
+
+<script>
+  const tabs = document.querySelectorAll('#tabs .scene-tab');
+  const scenes = document.querySelectorAll('.scene');
+  tabs.forEach(t => {
+    t.addEventListener('click', () => {
+      const target = t.dataset.scene;
+      tabs.forEach(x => x.classList.toggle('active', x === t));
+      scenes.forEach(s => s.classList.toggle('active', s.dataset.scene === target));
+    });
+  });
+</script>
+</body>
+</html>

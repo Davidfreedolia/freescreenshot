@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 96" role="img" aria-label="freescreenshot">
+  <title>freescreenshot wordmark (light mode)</title>
+  <g stroke="#65A30D" stroke-width="3.5" stroke-linecap="square" fill="none">
+    <path d="M 16 28 L 16 16 L 28 16" />
+    <path d="M 64 68 L 64 80 L 52 80" />
+  </g>
+  <circle cx="40" cy="48" r="3" fill="#65A30D" />
+  <text x="100" y="62"
+        font-family="Inter, 'Segoe UI Variable', 'Segoe UI', system-ui, sans-serif"
+        font-size="38"
+        font-weight="600"
+        letter-spacing="-0.5"
+        fill="#1A1814">freescreenshot</text>
+</svg>

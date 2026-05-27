@@ -1,0 +1,58 @@
+name: build
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Test (Windows)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore
+        run: dotnet restore FreeScreenshot.sln
+
+      - name: Build (Release)
+        run: dotnet build FreeScreenshot.sln --configuration Release --no-restore
+
+      - name: Test
+        run: dotnet test FreeScreenshot.sln --configuration Release --no-build --verbosity normal
+
+      - name: Publish Tray (win-x64, framework-dependent)
+        run: >
+          dotnet publish src/FreeScreenshot.Tray/FreeScreenshot.Tray.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained false
+          --output publish/win-x64
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: FreeScreenshot-win-x64-${{ github.sha }}
+          path: publish/win-x64/
+          retention-days: 14
+
+  lint:
+    name: Format check
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+      - name: dotnet format --verify-no-changes
+        run: dotnet format FreeScreenshot.sln --verify-no-changes --severity warn
+        continue-on-error: true   # advisory only for now

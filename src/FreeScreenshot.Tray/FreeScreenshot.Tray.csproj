@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows10.0.19041.0</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <RootNamespace>FreeScreenshot</RootNamespace>
+    <AssemblyName>FreeScreenshot</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+
+    <!-- Single-file publish friendly -->
+    <PublishSingleFile Condition="'$(PublishSingleFile)' == ''">false</PublishSingleFile>
+    <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
+
+    <!-- Branding -->
+    <Product>FreeScreenshot</Product>
+    <Company>Freedolia</Company>
+    <Copyright>Copyright (c) Freedolia. Licensed under GPLv3.</Copyright>
+    <Version>0.0.1</Version>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FreeScreenshot.Core\FreeScreenshot.Core.csproj" />
+    <ProjectReference Include="..\FreeScreenshot.UI\FreeScreenshot.UI.csproj" />
+  </ItemGroup>
+</Project>
