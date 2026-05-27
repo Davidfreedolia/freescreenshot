@@ -1,0 +1,79 @@
+name: release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version tag (e.g. v0.0.1)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  publish:
+    name: Build & publish release (win-x64)
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Resolve version
+        id: ver
+        shell: pwsh
+        run: |
+          $tag = if ($env:GITHUB_REF -like 'refs/tags/*') {
+            $env:GITHUB_REF -replace 'refs/tags/',''
+          } else {
+            '${{ inputs.version }}'
+          }
+          $semver = $tag.TrimStart('v')
+          "tag=$tag"     | Out-File -Append -FilePath $env:GITHUB_OUTPUT
+          "semver=$semver" | Out-File -Append -FilePath $env:GITHUB_OUTPUT
+          Write-Host "Releasing $tag (semver $semver)"
+
+      - name: Restore
+        run: dotnet restore FreeScreenshot.sln
+
+      - name: Publish (self-contained, single file, win-x64)
+        run: >
+          dotnet publish src/FreeScreenshot.Tray/FreeScreenshot.Tray.csproj
+          --configuration Release
+          --runtime win-x64
+          --self-contained true
+          -p:PublishSingleFile=true
+          -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:Version=${{ steps.ver.outputs.semver }}
+          --output publish/win-x64
+
+      - name: Stage artifacts
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path artifacts | Out-Null
+          $tag = '${{ steps.ver.outputs.tag }}'
+          $src = 'publish/win-x64/FreeScreenshot.exe'
+          $dst = "artifacts/FreeScreenshot-$tag-win-x64.exe"
+          Copy-Item $src $dst
+          $sha = (Get-FileHash $dst -Algorithm SHA256).Hash.ToLower()
+          "$sha  $(Split-Path $dst -Leaf)" | Out-File -Encoding ascii "artifacts/SHA256SUMS.txt"
+          Get-ChildItem artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.ver.outputs.tag }}
+          name: FreeScreenshot ${{ steps.ver.outputs.tag }}
+          generate_release_notes: true
+          files: |
+            artifacts/FreeScreenshot-${{ steps.ver.outputs.tag }}-win-x64.exe
+            artifacts/SHA256SUMS.txt

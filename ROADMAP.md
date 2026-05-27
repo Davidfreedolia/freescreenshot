@@ -152,10 +152,11 @@ FreeScreenshot/
 - [ ] Sense backend propi mantenint = zero cost operatiu
 
 ### Fase 5 — Distribució (paral·lel a F3-F4)
-- [ ] Signatura de codi (necessari per evitar avís Windows SmartScreen) — uns 200-400€/any
-- [ ] Auto-updater (`Velopack` o `Squirrel.Windows`)
-- [ ] Pàgina web simple
-- [ ] Decidir model: gratuït, donació, llicència de pagament
+- [ ] Workflow `release.yml` que en cada tag `v*.*.*` publica el `.exe` a **GitHub Releases**
+- [ ] Generar checksum SHA256 del `.exe` i adjuntar-lo al Release
+- [ ] Pàgina simple a **freedolia.com/freescreenshot** amb botó "Descarregar" que enllaça al darrer Release de GitHub (`/releases/latest/download/FreeScreenshot-Setup.exe`)
+- [ ] Auto-updater (`Velopack` o `Squirrel.Windows`) que consulta GitHub Releases
+- [ ] Signatura de codi (per evitar avís Windows SmartScreen) — ajornat fins que el projecte tingui tracció. Sense signar funciona, però els usuaris veuen un avís "Windows ha protegit el teu PC" la primera vegada.
 
 ---
 
@@ -187,7 +188,7 @@ Sent el codi públic, qualsevol pot comparar amb CleanShot. Per tant:
 ### Decisions preses
 1. **Monetització:** gratuït + donacions (model tipus OBS Studio, FreeCAD, Shotcut). Botó "Donate" a Settings i a la web. Plataforma: **Stripe** (el David ja en té compte des de Freedolia).
 2. **Cloud:** ajornat. Si s'arriba a fer, només via BYOC (Bring Your Own Cloud) — l'usuari connecta el seu S3/Imgur/Dropbox. Zero infraestructura pròpia que mantenir.
-3. **Nom:** **FreeScreenshot** (definitiu). Recomanat fer cerca ràpida a EUIPO/USPTO/TMview per confirmar que ningú ja l'ha registrat com a marca; també comprovar disponibilitat del domini (freescreenshot.com, .app, .io...).
+3. **Nom:** **FreeScreenshot** (definitiu). Recomanat fer cerca ràpida a EUIPO/USPTO/TMview per confirmar que ningú ja l'ha registrat com a marca. **Sense domini propi** — viu sota `freedolia.com/freescreenshot`.
 4. **Llicència:** **Open source**. Recomanació: GPLv3 o MPL 2.0 (copyleft moderat, evita que algú agafi el codi i en faci una versió tancada de pagament sense contribuir). MIT seria més permissiu però facilita que algú s'aprofiti del teu treball comercialment sense aportar res.
 
 ---
