@@ -56,3 +56,6 @@ settings-screenshot.png
 installer/dist/
 publish/
 
+
+.wrangler/
+
