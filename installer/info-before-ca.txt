@@ -1,0 +1,29 @@
+Què és FreeScreenshot
+
+És una eina de captura de pantalla minimalista per Windows. Gratuïta, open source, fa el seu paper sense molestar.
+
+
+On viu
+=======
+
+Un cop instal·lada, l'app viu a la safata del sistema (a baix a la dreta, prop del rellotge).
+
+Si no veus la icona, prem la fletxa cap amunt (^) per expandir la safata, i arrossega la icona lime de FreeScreenshot cap a la barra principal perquè es quedi sempre visible.
+
+
+Com es fa servir
+================
+
+* Clic dret sobre la icona  → menú amb Configuració, Quant a, Donar i Sortir.
+* Doble clic                 → obre la finestra de Configuració.
+* Properes versions afegiran les dreceres de captura (Ctrl+Shift+1, Ctrl+Shift+2, ...).
+
+
+Privadesa
+=========
+
+FreeScreenshot envia tres senyals opcionals a freedolia.com: el ping d'instal·lació, la comprovació silenciosa de versions noves, i l'enquesta opcional al desinstal·lar. Pots desactivar-ho tot a Configuració → Privacitat.
+
+Llicència: GPLv3.
+
+Una eina de freedolia.com — si t'agrada, considera donar suport via Stripe des de l'opció Donar.

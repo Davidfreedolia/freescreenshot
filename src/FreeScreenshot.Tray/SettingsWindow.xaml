@@ -1,8 +1,7 @@
 <Window x:Class="FreeScreenshot.SettingsWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="FreeScreenshot — Configuració"
-        Width="640" Height="460"
+        Width="680" Height="500"
         WindowStartupLocation="CenterScreen"
         Background="{DynamicResource Brush.Bg.Base}"
         FontFamily="{DynamicResource Font.Ui}"
@@ -13,86 +12,83 @@
 
   <Grid>
     <Grid.ColumnDefinitions>
-      <ColumnDefinition Width="180"/>
+      <ColumnDefinition Width="200"/>
       <ColumnDefinition Width="*"/>
     </Grid.ColumnDefinitions>
 
-    <!-- Sidebar -->
     <Border Grid.Column="0" Background="{DynamicResource Brush.Bg.Surface1}"
             BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,0,1,0">
       <StackPanel Margin="12,16,12,16">
-        <TextBlock Text="freescreenshot" FontSize="14" FontWeight="SemiBold"
-                   Foreground="{DynamicResource Brush.Text.Primary}" Margin="6,0,0,2"/>
-        <TextBlock Text="Configuració" FontSize="11"
+        <TextBlock Text="freescreenshot" FontSize="14" FontWeight="SemiBold" Margin="6,0,0,2"/>
+        <TextBlock x:Name="SidebarSubtitle" FontSize="11"
                    Foreground="{DynamicResource Brush.Text.Muted}" Margin="6,0,0,18"/>
-
-        <RadioButton x:Name="NavGeneral" Content="General" GroupName="nav"
-                     Style="{DynamicResource NavRadio}" IsChecked="True" Checked="OnNavChanged"/>
-        <RadioButton x:Name="NavPrivacy" Content="Privacitat" GroupName="nav"
-                     Style="{DynamicResource NavRadio}" Checked="OnNavChanged"/>
-        <RadioButton x:Name="NavAbout"   Content="Quant a"   GroupName="nav"
-                     Style="{DynamicResource NavRadio}" Checked="OnNavChanged"/>
+        <RadioButton x:Name="NavGeneral" GroupName="nav" Style="{DynamicResource NavRadio}"
+                     IsChecked="True" Checked="OnNavChanged"/>
+        <RadioButton x:Name="NavPrivacy" GroupName="nav" Style="{DynamicResource NavRadio}"
+                     Checked="OnNavChanged"/>
+        <RadioButton x:Name="NavAbout" GroupName="nav" Style="{DynamicResource NavRadio}"
+                     Checked="OnNavChanged"/>
       </StackPanel>
     </Border>
 
-    <!-- Content -->
     <Grid Grid.Column="1" Margin="32,28,32,24">
       <!-- General -->
       <StackPanel x:Name="PageGeneral" Visibility="Visible">
-        <TextBlock Text="General" FontSize="22" FontWeight="SemiBold"/>
-        <TextBlock Text="Comportament de l'app a Windows."
-                   Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,4,0,24"/>
+        <TextBlock x:Name="GenH" FontSize="22" FontWeight="SemiBold"/>
+        <TextBlock x:Name="GenSub" Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,4,0,24"/>
 
-        <TextBlock Text="(Encara no hi ha opcions configurables. Aviat: dreceres, format de sortida, carpeta de captures.)"
-                   Foreground="{DynamicResource Brush.Text.Muted}" TextWrapping="Wrap"/>
+        <DockPanel LastChildFill="True" Margin="0,0,0,16">
+          <TextBlock x:Name="GenLangLbl" DockPanel.Dock="Left" VerticalAlignment="Center"
+                     MinWidth="120" Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
+          <ComboBox x:Name="LangCombo" HorizontalAlignment="Left" Width="220" SelectionChanged="OnLangChanged"
+                    Background="{DynamicResource Brush.Bg.Surface2}"
+                    Foreground="{DynamicResource Brush.Text.Primary}"
+                    BorderBrush="{DynamicResource Brush.Border.Subtle}" Padding="8">
+            <ComboBoxItem Tag="ca" Content="Català"/>
+            <ComboBoxItem Tag="es" Content="Castellano"/>
+            <ComboBoxItem Tag="en" Content="English"/>
+          </ComboBox>
+        </DockPanel>
+
+        <TextBlock x:Name="GenPlaceholder" Foreground="{DynamicResource Brush.Text.Muted}" TextWrapping="Wrap"/>
       </StackPanel>
 
       <!-- Privacy -->
       <StackPanel x:Name="PagePrivacy" Visibility="Collapsed">
-        <TextBlock Text="Privacitat" FontSize="22" FontWeight="SemiBold"/>
-        <TextBlock Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,4,0,24" TextWrapping="Wrap">
-          Tres senyals opt-in que FreeScreenshot envia a freedolia.com.
-          Pots desactivar-los tots en aquesta secció.
-        </TextBlock>
+        <TextBlock x:Name="PrivH" FontSize="22" FontWeight="SemiBold"/>
+        <TextBlock x:Name="PrivSub" Foreground="{DynamicResource Brush.Text.Secondary}"
+                   Margin="0,4,0,24" TextWrapping="Wrap"/>
 
         <Border Background="{DynamicResource Brush.Bg.Surface1}"
                 BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1"
                 CornerRadius="10" Padding="16">
-          <StackPanel>
-            <DockPanel LastChildFill="True">
-              <CheckBox x:Name="TrackingToggle" DockPanel.Dock="Right"
-                        VerticalAlignment="Center" Margin="16,0,0,0"
-                        Checked="OnTrackingChanged" Unchecked="OnTrackingChanged"/>
-              <StackPanel>
-                <TextBlock Text="Compartir dades anònimes amb freedolia.com" FontWeight="SemiBold"/>
-                <TextBlock Foreground="{DynamicResource Brush.Text.Muted}" Margin="0,2,0,0" TextWrapping="Wrap">
-                  Inclou l'avís d'instal·lació a la primera arrencada, la comprovació silenciosa
-                  de versions noves i l'enquesta opcional en desinstal·lar.
-                </TextBlock>
-              </StackPanel>
-            </DockPanel>
-          </StackPanel>
+          <DockPanel LastChildFill="True">
+            <CheckBox x:Name="TrackingToggle" DockPanel.Dock="Right"
+                      VerticalAlignment="Center" Margin="16,0,0,0"
+                      Checked="OnTrackingChanged" Unchecked="OnTrackingChanged"/>
+            <StackPanel>
+              <TextBlock x:Name="PrivToggleTitle" FontWeight="SemiBold"/>
+              <TextBlock x:Name="PrivToggleDesc" Foreground="{DynamicResource Brush.Text.Muted}"
+                         Margin="0,2,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+          </DockPanel>
         </Border>
 
-        <TextBlock Margin="0,16,0,0" FontSize="12"
-                   Foreground="{DynamicResource Brush.Text.Muted}" TextWrapping="Wrap">
-          Identificador local d'instal·lació:
-        </TextBlock>
+        <TextBlock x:Name="PrivIdLabel" Margin="0,16,0,0" FontSize="12"
+                   Foreground="{DynamicResource Brush.Text.Muted}"/>
         <TextBlock x:Name="InstallIdText" FontFamily="{DynamicResource Font.Mono}"
                    Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,2,0,0"/>
 
-        <Button Content="Llegir política de privadesa" Margin="0,20,0,0" HorizontalAlignment="Left"
+        <Button x:Name="PrivOpenPolicy" Margin="0,20,0,0" HorizontalAlignment="Left"
                 Click="OnOpenPrivacy" Background="Transparent"
                 Foreground="{DynamicResource Brush.Accent.Base}" BorderThickness="0"
                 Padding="0" Cursor="Hand"/>
       </StackPanel>
 
-      <!-- About -->
+      <!-- About + Donate -->
       <StackPanel x:Name="PageAbout" Visibility="Collapsed">
-        <TextBlock Text="Quant a" FontSize="22" FontWeight="SemiBold"/>
-        <TextBlock Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,4,0,24">
-          freescreenshot · una eina de freedolia.com
-        </TextBlock>
+        <TextBlock x:Name="AboutH" FontSize="22" FontWeight="SemiBold"/>
+        <TextBlock x:Name="AboutSub" Foreground="{DynamicResource Brush.Text.Secondary}" Margin="0,4,0,24"/>
 
         <Grid>
           <Grid.ColumnDefinitions>
@@ -104,21 +100,30 @@
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto"/>
           </Grid.RowDefinitions>
-
-          <TextBlock Grid.Row="0" Grid.Column="0" Text="Versió"
-                     Foreground="{DynamicResource Brush.Text.Muted}" Margin="0,0,0,8"/>
+          <TextBlock Grid.Row="0" Grid.Column="0" x:Name="AbVerLbl" Foreground="{DynamicResource Brush.Text.Muted}" Margin="0,0,0,8"/>
           <TextBlock x:Name="VersionText" Grid.Row="0" Grid.Column="1" Margin="0,0,0,8"
                      FontFamily="{DynamicResource Font.Mono}"/>
-
-          <TextBlock Grid.Row="1" Grid.Column="0" Text="Llicència"
-                     Foreground="{DynamicResource Brush.Text.Muted}" Margin="0,0,0,8"/>
+          <TextBlock Grid.Row="1" Grid.Column="0" x:Name="AbLicLbl" Foreground="{DynamicResource Brush.Text.Muted}" Margin="0,0,0,8"/>
           <TextBlock Grid.Row="1" Grid.Column="1" Text="GPLv3" Margin="0,0,0,8"/>
-
-          <TextBlock Grid.Row="2" Grid.Column="0" Text="Codi"
-                     Foreground="{DynamicResource Brush.Text.Muted}"/>
+          <TextBlock Grid.Row="2" Grid.Column="0" x:Name="AbCodeLbl" Foreground="{DynamicResource Brush.Text.Muted}"/>
           <TextBlock Grid.Row="2" Grid.Column="1" Text="github.com/Davidfreedolia/freescreenshot"
                      FontFamily="{DynamicResource Font.Mono}"/>
         </Grid>
+
+        <Border Margin="0,24,0,0" Background="{DynamicResource Brush.Bg.Surface1}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1"
+                CornerRadius="10" Padding="16">
+          <StackPanel>
+            <TextBlock x:Name="DonateAboutTitle" FontWeight="SemiBold"/>
+            <TextBlock x:Name="DonateAboutSub" Foreground="{DynamicResource Brush.Text.Secondary}"
+                       Margin="0,4,0,12" TextWrapping="Wrap"/>
+            <Button x:Name="DonateBtn" Padding="14,8" HorizontalAlignment="Left"
+                    Background="{DynamicResource Brush.Accent.Base}"
+                    Foreground="#FF1A1814" BorderThickness="0"
+                    FontWeight="SemiBold" Cursor="Hand"
+                    Click="OnDonate"/>
+          </StackPanel>
+        </Border>
       </StackPanel>
     </Grid>
   </Grid>

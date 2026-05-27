@@ -1,8 +1,12 @@
+using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
 using FreeScreenshot.Core.Config;
+using FreeScreenshot.Core.Localization;
 using FreeScreenshot.Core.Telemetry;
+using Application = System.Windows.Application;
+using MessageBox = System.Windows.MessageBox;
 
 namespace FreeScreenshot;
 
@@ -15,7 +19,6 @@ public partial class App : Application
     public AppConfig Config { get; private set; } = new();
     public TelemetryClient? Telemetry { get; private set; }
 
-    /// <summary>App version pulled from the assembly metadata.</summary>
     public static string AppVersion
     {
         get
@@ -29,7 +32,36 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // ---- Single-instance gate ----
+        // Catch anything that would otherwise silently kill the app.
+        AppDomain.CurrentDomain.UnhandledException += (_, ex) => LogFatal(ex.ExceptionObject);
+        DispatcherUnhandledException += (_, ex) =>
+        {
+            LogFatal(ex.Exception);
+            ex.Handled = true;
+        };
+
+        // Load config + language first.
+        Config = AppConfig.Load();
+        Config.EnsureInstallId();
+        if (!string.IsNullOrWhiteSpace(Config.Lang)) Strings.SetLang(Config.Lang!);
+        else
+        {
+            Strings.InitFromSystem();
+            Config.Lang = Strings.Current;
+            Config.Save();
+        }
+
+        // Special mode: uninstall feedback dialog only.
+        if (e.Args.Any(a => a.Equals("--uninstall-feedback", StringComparison.OrdinalIgnoreCase)))
+        {
+            Telemetry = new TelemetryClient(Config);
+            var dlg = new UninstallFeedbackWindow(Telemetry, AppVersion);
+            dlg.ShowDialog();
+            Shutdown();
+            return;
+        }
+
+        // Single-instance gate (skip for --uninstall-feedback above).
         _instanceMutex = new Mutex(initiallyOwned: true, SingleInstanceMutexName, out var isNewInstance);
         if (!isNewInstance)
         {
@@ -42,14 +74,11 @@ public partial class App : Application
             return;
         }
 
-        // ---- Config + telemetry ----
-        Config = AppConfig.Load();
-        Config.EnsureInstallId();
         Telemetry = new TelemetryClient(Config);
 
-        // ---- Tray ----
         _tray = new TrayHost(this);
-        // First-run balloon so the user can find the icon.
+
+        // First-launch balloon so the user finds the icon.
         if (string.IsNullOrWhiteSpace(Config.ConsentedPrivacyVersion))
         {
             _tray.ShowStartupBalloon();
@@ -57,14 +86,9 @@ public partial class App : Application
             Config.Save();
         }
 
-        // ---- Optional CLI flag: --settings opens Settings on launch.
-        // Useful for pinned shortcuts and for first-run UX.
         if (e.Args.Any(a => a.Equals("--settings", StringComparison.OrdinalIgnoreCase)))
-        {
             new SettingsWindow().Show();
-        }
 
-        // ---- Fire-and-forget background tasks ----
         _ = Task.Run(BackgroundStartupTasksAsync);
     }
 
@@ -72,7 +96,7 @@ public partial class App : Application
     {
         if (Telemetry is null) return;
 
-        var lang = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+        var lang = Strings.Current;
         var os = System.Environment.OSVersion.VersionString;
         await Telemetry.TryReportInstallAsync(AppVersion, lang, os);
 
@@ -89,7 +113,6 @@ public partial class App : Application
         }
     }
 
-    /// <summary>Naive semver-ish compare: "1.2.3" vs "1.2.4". Returns true if `a` &gt; `b`.</summary>
     private static bool IsNewer(string a, string b)
     {
         static int[] Parts(string s) => s
@@ -109,6 +132,21 @@ public partial class App : Application
             if (va < vb) return false;
         }
         return false;
+    }
+
+    private static void LogFatal(object? ex)
+    {
+        try
+        {
+            var dir = AppConfig.ConfigDirectory;
+            Directory.CreateDirectory(dir);
+            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {ex}\n";
+            File.AppendAllText(Path.Combine(dir, "fatal.log"), line);
+        }
+        catch
+        {
+            // last-resort logging — don't recurse on failure
+        }
     }
 
     protected override void OnExit(ExitEventArgs e)

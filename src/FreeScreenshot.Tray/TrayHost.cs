@@ -1,74 +1,75 @@
-using System.Windows;
-using System.Windows.Controls;
-using H.NotifyIcon;
-using H.NotifyIcon.Core;
+using System.Diagnostics;
+using System.Drawing;
+using System.Reflection;
+using System.Windows.Forms;
+using FreeScreenshot.Core.Localization;
+using Application = System.Windows.Application;
 
 namespace FreeScreenshot;
 
 /// <summary>
-/// Owns the tray icon and its context menu. The app lives here when no window is open.
+/// Tray host using the classic System.Windows.Forms.NotifyIcon — bulletproof
+/// since .NET Framework 1.0. The icon is extracted from the .exe itself
+/// (we set ApplicationIcon in the csproj), so we never touch pack URIs.
 /// </summary>
 internal sealed class TrayHost : IDisposable
 {
     private readonly App _app;
-    private readonly TaskbarIcon _icon;
+    private readonly NotifyIcon _icon;
     private bool _disposed;
 
     public TrayHost(App app)
     {
         _app = app;
 
-        _icon = new TaskbarIcon
+        _icon = new NotifyIcon
         {
-            ToolTipText = "FreeScreenshot",
-            IconSource = IconFactory.CreateTrayIcon(),
-            ContextMenu = BuildMenu(),
+            Icon = LoadIcon(),
+            Text = Strings.T("tray.tooltip"),
+            Visible = true,
+            ContextMenuStrip = BuildMenu(),
         };
-        _icon.TrayMouseDoubleClick += (_, _) => OpenSettings();
-
-        // Force the icon to materialise immediately — otherwise it may stay
-        // un-rendered until the first system tray refresh.
-        _icon.ForceCreate();
+        _icon.MouseDoubleClick += (_, e) =>
+        {
+            if (e.Button == MouseButtons.Left) OpenSettings();
+        };
     }
 
-    /// <summary>Shows a first-run balloon so the user knows where the app went.</summary>
     public void ShowStartupBalloon()
     {
         try
         {
-            _icon.ShowNotification(
-                title: "FreeScreenshot",
-                message: "Visc a la safata. Clica dret sobre la icona per opcions.",
-                icon: NotificationIcon.Info);
+            _icon.BalloonTipTitle = Strings.T("tray.balloon.title");
+            _icon.BalloonTipText  = Strings.T("tray.balloon.message");
+            _icon.BalloonTipIcon  = ToolTipIcon.Info;
+            _icon.ShowBalloonTip(5000);
         }
         catch
         {
-            // Older Windows versions or restricted notification policies — fail silently.
+            // Some Windows configurations disable toast notifications entirely. Fail silently.
         }
     }
 
-    private ContextMenu BuildMenu()
+    private static Icon LoadIcon()
     {
-        var menu = new ContextMenu();
-        menu.Items.Add(MakeItem("Configuració…", "Ctrl+,", OnSettingsClick));
-        menu.Items.Add(MakeItem("Quant a",          null,    OnAboutClick));
-        menu.Items.Add(new Separator());
-        menu.Items.Add(MakeItem("Sortir",           null,    OnQuitClick));
+        // The .ico is embedded in the .exe as ApplicationIcon — extract it from ourselves.
+        var exePath = Process.GetCurrentProcess().MainModule?.FileName
+                      ?? Assembly.GetExecutingAssembly().Location;
+        var icon = Icon.ExtractAssociatedIcon(exePath);
+        return icon ?? SystemIcons.Application;
+    }
+
+    private ContextMenuStrip BuildMenu()
+    {
+        var menu = new ContextMenuStrip();
+        menu.Items.Add(Strings.T("menu.settings"), null, (_, _) => OpenSettings());
+        menu.Items.Add(Strings.T("menu.about"),    null, (_, _) => OpenAbout());
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(Strings.T("menu.donate"),   null, (_, _) => OpenDonation());
+        menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(Strings.T("menu.quit"),     null, (_, _) => _app.Shutdown());
         return menu;
     }
-
-    private static MenuItem MakeItem(string header, string? gesture, RoutedEventHandler handler)
-    {
-        var item = new MenuItem { Header = header };
-        if (!string.IsNullOrEmpty(gesture)) item.InputGestureText = gesture;
-        item.Click += handler;
-        return item;
-    }
-
-    private void OnSettingsClick(object sender, RoutedEventArgs e) => OpenSettings();
-    private void OnAboutClick(object sender, RoutedEventArgs e) => OpenAbout();
-
-    private void OnQuitClick(object sender, RoutedEventArgs e) => _app.Shutdown();
 
     private static void OpenSettings()
     {
@@ -84,9 +85,19 @@ internal sealed class TrayHost : IDisposable
         new MainWindow().Show();
     }
 
+    private static void OpenDonation()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true });
+        }
+        catch { /* best effort */ }
+    }
+
     public void Dispose()
     {
         if (_disposed) return;
+        _icon.Visible = false;
         _icon.Dispose();
         _disposed = true;
     }

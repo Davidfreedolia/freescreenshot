@@ -1,0 +1,29 @@
+Qué es FreeScreenshot
+
+Una herramienta minimalista de capturas de pantalla para Windows. Gratuita, open source, hace su trabajo sin molestar.
+
+
+Dónde vive
+==========
+
+Una vez instalada, la app vive en la bandeja del sistema (abajo a la derecha, cerca del reloj).
+
+Si no ves el icono, pulsa la flecha hacia arriba (^) para expandir la bandeja, y arrastra el icono lime de FreeScreenshot a la barra principal para que se quede siempre visible.
+
+
+Cómo se usa
+===========
+
+* Clic derecho sobre el icono  → menú con Configuración, Acerca de, Donar y Salir.
+* Doble clic                   → abre la ventana de Configuración.
+* Próximas versiones añadirán los atajos de captura (Ctrl+Shift+1, Ctrl+Shift+2, ...).
+
+
+Privacidad
+==========
+
+FreeScreenshot envía tres señales opcionales a freedolia.com: el ping de instalación, la comprobación silenciosa de versiones nuevas, y la encuesta opcional al desinstalar. Puedes desactivarlo todo en Configuración → Privacidad.
+
+Licencia: GPLv3.
+
+Una herramienta de freedolia.com — si te gusta, considera apoyar el proyecto vía Stripe desde la opción Donar.
