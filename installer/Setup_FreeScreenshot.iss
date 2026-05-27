@@ -6,7 +6,7 @@
 ; Outputs installer\dist\Setup_FreeScreenshot.exe
 
 #define MyAppName        "FreeScreenshot"
-#define MyAppVersion     "1.0.0"
+#define MyAppVersion     "1.2.0"
 #define MyAppPublisher   "Freedolia"
 #define MyAppURL         "https://freedolia.com"
 #define MyAppExeName     "FreeScreenshot.exe"
@@ -70,7 +70,8 @@ en.TaskLaunch=Launch FreeScreenshot now
 en.ShortcutSettings=FreeScreenshot — Settings
 
 [Tasks]
-Name: "autostart"; Description: "{cm:TaskAutostart}"; GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
+Name: "desktopicon"; Description: "{cm:CreateDesktopIcon}"; GroupDescription: "{cm:AdditionalIcons}"
+Name: "autostart";   Description: "{cm:TaskAutostart}";    GroupDescription: "{cm:AdditionalIcons}"; Flags: unchecked
 
 [Files]
 Source: "..\publish\win-x64\FreeScreenshot.exe"; DestDir: "{app}"; Flags: ignoreversion
@@ -82,6 +83,7 @@ Source: "..\README.md";                          DestDir: "{app}"; Flags: ignore
 Name: "{group}\{#MyAppName}";          Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"
 Name: "{group}\{cm:ShortcutSettings}"; Filename: "{app}\{#MyAppExeName}"; Parameters: "--settings"; IconFilename: "{app}\{#MyAppExeName}"
 Name: "{userprograms}\{#MyAppName}";   Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"
+Name: "{userdesktop}\{#MyAppName}";    Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
 
 [Registry]
 Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "FreeScreenshot"; ValueData: """{app}\{#MyAppExeName}"""; Tasks: autostart; Flags: uninsdeletevalue

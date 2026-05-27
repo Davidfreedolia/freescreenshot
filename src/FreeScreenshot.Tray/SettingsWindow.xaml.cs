@@ -1,6 +1,7 @@
 using System.Diagnostics;
 using System.IO;
 using System.Windows;
+using FreeScreenshot.Core.Capture;
 using FreeScreenshot.Core.Config;
 using FreeScreenshot.Core.Localization;
 using Application = System.Windows.Application;
@@ -45,6 +46,24 @@ public partial class SettingsWindow : Window
                 break;
             }
         }
+
+        // Output
+        OutH.Text = Strings.T("settings.output.heading");
+        OutFolderLbl.Text = Strings.T("settings.output.folder");
+        OutBrowseBtn.Content = Strings.T("settings.output.browse");
+        OutOpenBtn.Content = Strings.T("settings.output.open");
+        CaptureFolderText.Text = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+            ? _config.CaptureFolder!
+            : GdiCaptureEngine.DefaultSaveFolder;
+
+        // Capture options
+        CapH.Text = Strings.T("settings.capture.heading");
+        EditorTitle.Text = Strings.T("settings.capture.editor.title");
+        EditorDesc.Text  = Strings.T("settings.capture.editor.desc");
+        EditorToggle.IsChecked = _config.AutoOpenEditor;
+        SoundTitle.Text = Strings.T("settings.capture.sound.title");
+        SoundDesc.Text  = Strings.T("settings.capture.sound.desc");
+        SoundToggle.IsChecked = _config.PlaySound;
 
         // Privacy
         PrivH.Text = Strings.T("settings.privacy.heading");
@@ -108,5 +127,50 @@ public partial class SettingsWindow : Window
     private void OnDonate(object sender, RoutedEventArgs e)
     {
         try { Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true }); } catch { }
+    }
+
+    private void OnBrowseCaptureFolder(object sender, RoutedEventArgs e)
+    {
+        var dlg = new System.Windows.Forms.FolderBrowserDialog
+        {
+            Description = Strings.T("settings.output.folder"),
+            SelectedPath = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+                ? _config.CaptureFolder!
+                : GdiCaptureEngine.DefaultSaveFolder,
+            UseDescriptionForTitle = true,
+        };
+        if (dlg.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+        {
+            _config.CaptureFolder = dlg.SelectedPath;
+            _config.Save();
+            CaptureFolderText.Text = dlg.SelectedPath;
+        }
+    }
+
+    private void OnEditorChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        _config.AutoOpenEditor = EditorToggle.IsChecked == true;
+        _config.Save();
+    }
+
+    private void OnSoundChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        _config.PlaySound = SoundToggle.IsChecked == true;
+        _config.Save();
+    }
+
+    private void OnOpenCaptureFolder(object sender, RoutedEventArgs e)
+    {
+        var folder = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+            ? _config.CaptureFolder!
+            : GdiCaptureEngine.DefaultSaveFolder;
+        try
+        {
+            Directory.CreateDirectory(folder);
+            Process.Start(new ProcessStartInfo(folder) { UseShellExecute = true });
+        }
+        catch { }
     }
 }

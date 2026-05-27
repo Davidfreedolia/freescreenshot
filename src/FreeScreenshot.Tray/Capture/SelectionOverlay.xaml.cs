@@ -12,8 +12,11 @@ namespace FreeScreenshot.Capture;
 
 public partial class SelectionOverlay : Window
 {
-    /// <summary>Selection in DIPs (top-left + size of the rectangle the user dragged).</summary>
+    /// <summary>Selection in DIPs relative to the overlay window's own coordinate space.</summary>
     public Rect? Selection { get; private set; }
+
+    /// <summary>Selection in physical pixels relative to the virtual desktop top-left.</summary>
+    public (int X, int Y, int W, int H)? PhysicalSelection { get; private set; }
 
     private Point _start;
     private bool _dragging;
@@ -22,17 +25,18 @@ public partial class SelectionOverlay : Window
     {
         InitializeComponent();
         WindowState = WindowState.Normal;
-        // Cover the primary screen — v1.0 limitation. Multi-monitor in v1.1.
-        Left = 0; Top = 0;
-        Width = SystemParameters.PrimaryScreenWidth;
-        Height = SystemParameters.PrimaryScreenHeight;
+        // Cover the entire virtual desktop (all monitors).
+        Left   = SystemParameters.VirtualScreenLeft;
+        Top    = SystemParameters.VirtualScreenTop;
+        Width  = SystemParameters.VirtualScreenWidth;
+        Height = SystemParameters.VirtualScreenHeight;
 
         Loaded += (_, _) =>
         {
             Activate();
             Focus();
             UpdateLayoutForRect(default);
-            HintText.Text = $"{ Strings.T("capture.hint") }";
+            HintText.Text = Strings.T("capture.hint");
             Canvas.SetLeft(HintBar, (Width - 320) / 2);
             Canvas.SetTop(HintBar, 24);
         };
@@ -43,6 +47,7 @@ public partial class SelectionOverlay : Window
         if (e.Key == Key.Escape)
         {
             Selection = null;
+            PhysicalSelection = null;
             DialogResult = false;
             Close();
         }
@@ -85,13 +90,22 @@ public partial class SelectionOverlay : Window
 
         if (rect.Width < 5 || rect.Height < 5)
         {
-            // Treat tiny drags as cancel.
             Selection = null;
+            PhysicalSelection = null;
             DialogResult = false;
         }
         else
         {
             Selection = rect;
+            // Convert to physical pixels relative to virtual desktop top-left.
+            var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
+            var virtLeft = SystemParameters.VirtualScreenLeft;
+            var virtTop  = SystemParameters.VirtualScreenTop;
+            PhysicalSelection = (
+                (int)Math.Round((rect.X + virtLeft) * dpi),
+                (int)Math.Round((rect.Y + virtTop)  * dpi),
+                (int)Math.Round(rect.Width  * dpi),
+                (int)Math.Round(rect.Height * dpi));
             DialogResult = true;
         }
         Close();
@@ -99,31 +113,27 @@ public partial class SelectionOverlay : Window
 
     private void UpdateLayoutForRect(Rect r)
     {
-        // Sel border
         Canvas.SetLeft(SelBorder, r.X);
         Canvas.SetTop(SelBorder, r.Y);
         SelBorder.Width = r.Width;
         SelBorder.Height = r.Height;
 
-        // 4 dim panels
-        DimTop.Width    = Width;        DimTop.Height    = r.Y;
-        Canvas.SetLeft(DimTop, 0);      Canvas.SetTop(DimTop, 0);
+        DimTop.Width = Width;               DimTop.Height = r.Y;
+        Canvas.SetLeft(DimTop, 0);          Canvas.SetTop(DimTop, 0);
 
-        DimBottom.Width = Width;        DimBottom.Height = Math.Max(0, Height - r.Bottom);
-        Canvas.SetLeft(DimBottom, 0);   Canvas.SetTop(DimBottom, r.Bottom);
+        DimBottom.Width = Width;            DimBottom.Height = Math.Max(0, Height - r.Bottom);
+        Canvas.SetLeft(DimBottom, 0);       Canvas.SetTop(DimBottom, r.Bottom);
 
-        DimLeft.Width   = r.X;          DimLeft.Height   = r.Height;
-        Canvas.SetLeft(DimLeft, 0);     Canvas.SetTop(DimLeft, r.Y);
+        DimLeft.Width = r.X;                DimLeft.Height = r.Height;
+        Canvas.SetLeft(DimLeft, 0);         Canvas.SetTop(DimLeft, r.Y);
 
-        DimRight.Width  = Math.Max(0, Width - r.Right);  DimRight.Height = r.Height;
-        Canvas.SetLeft(DimRight, r.Right); Canvas.SetTop(DimRight, r.Y);
+        DimRight.Width = Math.Max(0, Width - r.Right); DimRight.Height = r.Height;
+        Canvas.SetLeft(DimRight, r.Right);  Canvas.SetTop(DimRight, r.Y);
 
-        // Size chip
         var dpi = VisualTreeHelper.GetDpi(this).PixelsPerDip;
         var px = (int)Math.Round(r.Width * dpi);
         var py = (int)Math.Round(r.Height * dpi);
         SizeText.Text = $"{px} × {py}";
-        // Place just below the bottom-right corner, clamped to viewport.
         var chipX = Math.Min(r.X + r.Width + 6, Width - 80);
         var chipY = Math.Min(r.Y + r.Height + 6, Height - 28);
         Canvas.SetLeft(SizeChip, Math.Max(0, chipX));

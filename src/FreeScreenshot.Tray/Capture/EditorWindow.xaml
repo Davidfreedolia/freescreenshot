@@ -1,0 +1,114 @@
+<Window x:Class="FreeScreenshot.Capture.EditorWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FreeScreenshot — Editor"
+        Width="980" Height="700"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Bg.Base}"
+        FontFamily="{DynamicResource Font.Ui}"
+        Foreground="{DynamicResource Brush.Text.Primary}"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="48"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="48"/>
+    </Grid.RowDefinitions>
+
+    <!-- Top toolbar -->
+    <Border Grid.Row="0" Background="{DynamicResource Brush.Bg.Surface1}"
+            BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,0,0,1">
+      <DockPanel LastChildFill="False" Margin="12,0">
+        <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+          <RadioButton x:Name="ToolArrow" GroupName="tool" Style="{DynamicResource ToolBtn}" IsChecked="True">
+            <TextBlock x:Name="LblArrow"/>
+          </RadioButton>
+          <RadioButton x:Name="ToolRect" GroupName="tool" Style="{DynamicResource ToolBtn}">
+            <TextBlock x:Name="LblRect"/>
+          </RadioButton>
+          <RadioButton x:Name="ToolText" GroupName="tool" Style="{DynamicResource ToolBtn}">
+            <TextBlock x:Name="LblText"/>
+          </RadioButton>
+          <Separator Width="1" Height="22" Background="{DynamicResource Brush.Border.Subtle}" Margin="8,0"/>
+          <Button x:Name="UndoBtn" Style="{DynamicResource GhostBtn}" Click="OnUndo">
+            <TextBlock x:Name="LblUndo"/>
+          </Button>
+        </StackPanel>
+
+        <StackPanel DockPanel.Dock="Right" Orientation="Horizontal" VerticalAlignment="Center">
+          <TextBlock x:Name="DimensionsText" Foreground="{DynamicResource Brush.Text.Muted}"
+                     FontFamily="{DynamicResource Font.Mono}" FontSize="12" VerticalAlignment="Center"/>
+        </StackPanel>
+      </DockPanel>
+    </Border>
+
+    <!-- Canvas -->
+    <Border Grid.Row="1" Background="#FF14130F">
+      <ScrollViewer HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Auto">
+        <Grid x:Name="CanvasHost" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="24">
+          <Image x:Name="ShotImage" Stretch="None"/>
+          <Canvas x:Name="OverlayCanvas" Background="Transparent"
+                  MouseLeftButtonDown="OnCanvasDown"
+                  MouseMove="OnCanvasMove"
+                  MouseLeftButtonUp="OnCanvasUp"/>
+        </Grid>
+      </ScrollViewer>
+    </Border>
+
+    <!-- Bottom bar -->
+    <Border Grid.Row="2" Background="{DynamicResource Brush.Bg.Surface1}"
+            BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,1,0,0">
+      <DockPanel LastChildFill="False" Margin="12,0">
+        <Button x:Name="CancelBtn" DockPanel.Dock="Left" Style="{DynamicResource GhostBtn}" Click="OnCancel"/>
+        <Button x:Name="SaveBtn" DockPanel.Dock="Right" Padding="14,8" Margin="0,0,0,0"
+                Background="{DynamicResource Brush.Accent.Base}"
+                Foreground="#FF1A1814" BorderThickness="0"
+                FontWeight="SemiBold" Cursor="Hand"
+                Click="OnSave"/>
+        <Button x:Name="CopyBtn" DockPanel.Dock="Right" Padding="14,8" Margin="0,0,8,0"
+                Background="{DynamicResource Brush.Bg.Surface2}"
+                Foreground="{DynamicResource Brush.Text.Primary}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"
+                Click="OnCopy"/>
+      </DockPanel>
+    </Border>
+  </Grid>
+
+  <Window.Resources>
+    <Style x:Key="ToolBtn" TargetType="RadioButton">
+      <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="Margin" Value="2,0"/>
+      <Setter Property="Cursor" Value="Hand"/>
+      <Setter Property="Template">
+        <Setter.Value>
+          <ControlTemplate TargetType="RadioButton">
+            <Border x:Name="bd" Background="Transparent" CornerRadius="6"
+                    Padding="{TemplateBinding Padding}">
+              <ContentPresenter VerticalAlignment="Center"/>
+            </Border>
+            <ControlTemplate.Triggers>
+              <Trigger Property="IsMouseOver" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="{DynamicResource Brush.Bg.Surface2}"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
+              </Trigger>
+              <Trigger Property="IsChecked" Value="True">
+                <Setter TargetName="bd" Property="Background" Value="#1FA3E635"/>
+                <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Base}"/>
+              </Trigger>
+            </ControlTemplate.Triggers>
+          </ControlTemplate>
+        </Setter.Value>
+      </Setter>
+    </Style>
+    <Style x:Key="GhostBtn" TargetType="Button">
+      <Setter Property="Background" Value="Transparent"/>
+      <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Secondary}"/>
+      <Setter Property="BorderThickness" Value="0"/>
+      <Setter Property="Padding" Value="12,6"/>
+      <Setter Property="Cursor" Value="Hand"/>
+    </Style>
+  </Window.Resources>
+</Window>

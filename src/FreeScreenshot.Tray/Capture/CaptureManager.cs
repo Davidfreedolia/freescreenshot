@@ -1,8 +1,11 @@
+using System.Diagnostics;
 using System.IO;
+using System.Media;
 using System.Windows;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using FreeScreenshot.Core.Capture;
+using FreeScreenshot.Core.Config;
 using FreeScreenshot.Core.Localization;
 using FreeScreenshot.Hotkeys;
 using Application = System.Windows.Application;
@@ -10,41 +13,40 @@ using Clipboard = System.Windows.Clipboard;
 
 namespace FreeScreenshot.Capture;
 
-/// <summary>
-/// Owns the global hotkey + selection overlay + capture engine.
-/// One instance per app, created at startup, disposed on exit.
-/// </summary>
 internal sealed class CaptureManager : IDisposable
 {
-    // Default shortcut: Ctrl + Shift + 1. Can be made user-configurable later.
     private const uint VK_1 = 0x31;
+    private const uint VK_3 = 0x33;
 
     private readonly GlobalHotkey _hotkeys = new();
-    private readonly Action<string, string> _toast;
+    private readonly AppConfig _config;
+    private readonly Action<string, string, string?> _toast;
     private bool _capturing;
     private bool _disposed;
 
-    public CaptureManager(Action<string, string> showToast)
+    public CaptureManager(AppConfig config, Action<string, string, string?> showToast)
     {
+        _config = config;
         _toast = showToast;
-        var ok = _hotkeys.Register(
-            GlobalHotkey.Modifiers.Ctrl | GlobalHotkey.Modifiers.Shift,
-            VK_1,
-            OnHotkey);
-        if (ok == 0)
+        var mods = GlobalHotkey.Modifiers.Ctrl | GlobalHotkey.Modifiers.Shift;
+
+        if (_hotkeys.Register(mods, VK_1, () => Trigger(CaptureMode.Area)) == 0)
         {
-            // Another app already owns Ctrl+Shift+1. Tell the user, but don't crash.
-            _toast(Strings.T("capture.error.title"), Strings.T("capture.error.hotkey_busy"));
+            _toast(Strings.T("capture.error.title"), Strings.T("capture.error.hotkey_busy"), null);
         }
+        // Best-effort: Ctrl+Shift+3 for full-screen capture.
+        _hotkeys.Register(mods, VK_3, () => Trigger(CaptureMode.FullScreen));
     }
 
-    private void OnHotkey()
+    private enum CaptureMode { Area, FullScreen }
+
+    private void Trigger(CaptureMode mode)
     {
         if (_capturing) return;
         _capturing = true;
         try
         {
-            Application.Current.Dispatcher.BeginInvoke(new Action(RunCaptureFlow));
+            Application.Current.Dispatcher.BeginInvoke(new Action(() => RunCaptureFlow(mode)));
         }
         catch
         {
@@ -52,40 +54,78 @@ internal sealed class CaptureManager : IDisposable
         }
     }
 
-    private void RunCaptureFlow()
+    private void RunCaptureFlow(CaptureMode mode)
     {
         try
         {
-            var overlay = new SelectionOverlay();
-            var ok = overlay.ShowDialog();
-            if (ok != true || overlay.Selection is not { } sel || sel.Width < 1 || sel.Height < 1)
+            (int X, int Y, int W, int H) phys;
+
+            if (mode == CaptureMode.Area)
             {
-                return;
+                var overlay = new SelectionOverlay();
+                var ok = overlay.ShowDialog();
+                if (ok != true || overlay.PhysicalSelection is not { } p || p.W < 1 || p.H < 1)
+                    return;
+                phys = p;
+            }
+            else
+            {
+                var dpi = VisualTreeHelper.GetDpi(Application.Current.MainWindow ?? new Window()).PixelsPerDip;
+                phys = (
+                    (int)Math.Round(SystemParameters.VirtualScreenLeft * dpi),
+                    (int)Math.Round(SystemParameters.VirtualScreenTop  * dpi),
+                    (int)Math.Round(SystemParameters.VirtualScreenWidth  * dpi),
+                    (int)Math.Round(SystemParameters.VirtualScreenHeight * dpi));
             }
 
-            // DIPs → physical pixels.
-            var dpi = VisualTreeHelper.GetDpi(overlay).PixelsPerDip;
-            var px = (int)Math.Round(sel.X * dpi);
-            var py = (int)Math.Round(sel.Y * dpi);
-            var pw = (int)Math.Round(sel.Width * dpi);
-            var ph = (int)Math.Round(sel.Height * dpi);
-
-            // Give the OS one frame to actually paint the overlay away
-            // before we grab the screen.
+            // Let the overlay un-paint before we grab.
             Application.Current.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Render);
+            System.Threading.Thread.Sleep(60);
 
-            var png = GdiCaptureEngine.CapturePng(px, py, pw, ph);
-            var path = GdiCaptureEngine.SaveToDisk(png);
+            var png = GdiCaptureEngine.CapturePng(phys.X, phys.Y, phys.W, phys.H);
 
-            CopyPngToClipboard(png);
+            if (_config.PlaySound)
+            {
+                try { SystemSounds.Asterisk.Play(); } catch { }
+            }
+
+            // Editor flow.
+            if (_config.AutoOpenEditor)
+            {
+                var editor = new EditorWindow(png);
+                var ok = editor.ShowDialog();
+                if (ok != true || editor.EditedPng is null)
+                {
+                    return;
+                }
+                png = editor.EditedPng;
+                if (!editor.ShouldSave)
+                {
+                    // User chose Copy-only — clipboard set in editor, no toast needed.
+                    _toast(Strings.T("capture.toast.saved.title"),
+                           string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", "(portapapers)"),
+                           null);
+                    return;
+                }
+            }
+            else
+            {
+                CopyPngToClipboard(png);
+            }
+
+            var folder = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+                ? _config.CaptureFolder!
+                : GdiCaptureEngine.DefaultSaveFolder;
+            var path = GdiCaptureEngine.SaveToDisk(png, folder);
 
             _toast(
                 Strings.T("capture.toast.saved.title"),
-                string.Format(Strings.T("capture.toast.saved.body"), $"{pw}×{ph}", Path.GetFileName(path)));
+                string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", Path.GetFileName(path)),
+                path);
         }
         catch (Exception ex)
         {
-            _toast(Strings.T("capture.error.title"), ex.Message);
+            _toast(Strings.T("capture.error.title"), ex.Message, null);
         }
         finally
         {
@@ -103,10 +143,7 @@ internal sealed class CaptureManager : IDisposable
             frame.Freeze();
             Clipboard.SetImage(frame);
         }
-        catch
-        {
-            // Clipboard is finicky; failure is non-fatal.
-        }
+        catch { }
     }
 
     public void Dispose()

@@ -16,6 +16,7 @@ public partial class App : Application
     private const string SingleInstanceMutexName = @"Global\Freedolia.FreeScreenshot.Singleton";
 
     private Mutex? _instanceMutex;
+    private bool _mutexOwned;
     internal TrayHost? _tray;
     private CaptureManager? _capture;
     public AppConfig Config { get; private set; } = new();
@@ -34,7 +35,6 @@ public partial class App : Application
     {
         base.OnStartup(e);
 
-        // Catch anything that would otherwise silently kill the app.
         AppDomain.CurrentDomain.UnhandledException += (_, ex) => LogFatal(ex.ExceptionObject);
         DispatcherUnhandledException += (_, ex) =>
         {
@@ -42,7 +42,6 @@ public partial class App : Application
             ex.Handled = true;
         };
 
-        // Load config + language first.
         Config = AppConfig.Load();
         Config.EnsureInstallId();
         if (!string.IsNullOrWhiteSpace(Config.Lang)) Strings.SetLang(Config.Lang!);
@@ -53,7 +52,6 @@ public partial class App : Application
             Config.Save();
         }
 
-        // Special mode: uninstall feedback dialog only.
         if (e.Args.Any(a => a.Equals("--uninstall-feedback", StringComparison.OrdinalIgnoreCase)))
         {
             Telemetry = new TelemetryClient(Config);
@@ -63,8 +61,8 @@ public partial class App : Application
             return;
         }
 
-        // Single-instance gate (skip for --uninstall-feedback above).
         _instanceMutex = new Mutex(initiallyOwned: true, SingleInstanceMutexName, out var isNewInstance);
+        _mutexOwned = isNewInstance;
         if (!isNewInstance)
         {
             MessageBox.Show(
@@ -77,23 +75,38 @@ public partial class App : Application
         }
 
         Telemetry = new TelemetryClient(Config);
-
         _tray = new TrayHost(this);
 
-        // First-launch balloon so the user finds the icon.
-        if (string.IsNullOrWhiteSpace(Config.ConsentedPrivacyVersion))
+        _capture = new CaptureManager(Config, (title, body, path) =>
         {
-            _tray.ShowStartupBalloon();
-            Config.ConsentedPrivacyVersion = "v1";
-            Config.Save();
-        }
+            _tray?.ShowToast(title, body, path);
+            if (!string.IsNullOrEmpty(path))
+            {
+                // Remember in history (most-recent first, capped at 20).
+                Config.RecentCaptures.Remove(path);
+                Config.RecentCaptures.Insert(0, path);
+                while (Config.RecentCaptures.Count > 20) Config.RecentCaptures.RemoveAt(Config.RecentCaptures.Count - 1);
+                Config.Save();
+                _tray?.RefreshMenu();
+            }
+        });
 
         if (e.Args.Any(a => a.Equals("--settings", StringComparison.OrdinalIgnoreCase)))
             new SettingsWindow().Show();
 
-        // Wire up the capture hotkey AFTER the tray exists (so toasts can use it).
-        _capture = new CaptureManager((title, body) =>
-            _tray?.ShowToast(title, body));
+        // First-launch onboarding so users never lose track of the tray icon.
+        if (!Config.OnboardingDone)
+        {
+            var ob = new OnboardingWindow();
+            ob.Show();
+            Config.ConsentedPrivacyVersion ??= "v1";
+            Config.Save();
+        }
+        else
+        {
+            // Subsequent launches: brief balloon so the tray is at least signposted.
+            _tray.ShowStartupBalloon();
+        }
 
         _ = Task.Run(BackgroundStartupTasksAsync);
     }
@@ -101,7 +114,6 @@ public partial class App : Application
     private async Task BackgroundStartupTasksAsync()
     {
         if (Telemetry is null) return;
-
         var lang = Strings.Current;
         var os = System.Environment.OSVersion.VersionString;
         await Telemetry.TryReportInstallAsync(AppVersion, lang, os);
@@ -126,7 +138,6 @@ public partial class App : Application
             .Split('.', StringSplitOptions.RemoveEmptyEntries)
             .Select(p => int.TryParse(p, out var n) ? n : 0)
             .ToArray();
-
         var pa = Parts(a);
         var pb = Parts(b);
         var max = Math.Max(pa.Length, pb.Length);
@@ -146,20 +157,21 @@ public partial class App : Application
         {
             var dir = AppConfig.ConfigDirectory;
             Directory.CreateDirectory(dir);
-            var line = $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {ex}\n";
-            File.AppendAllText(Path.Combine(dir, "fatal.log"), line);
+            File.AppendAllText(Path.Combine(dir, "fatal.log"),
+                $"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {ex}\n");
         }
-        catch
-        {
-            // last-resort logging — don't recurse on failure
-        }
+        catch { }
     }
 
     protected override void OnExit(ExitEventArgs e)
     {
         _capture?.Dispose();
         _tray?.Dispose();
-        _instanceMutex?.ReleaseMutex();
+        if (_mutexOwned)
+        {
+            try { _instanceMutex?.ReleaseMutex(); }
+            catch (ApplicationException) { /* not owned anymore, fine */ }
+        }
         _instanceMutex?.Dispose();
         base.OnExit(e);
     }

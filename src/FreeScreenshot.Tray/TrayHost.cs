@@ -1,21 +1,19 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Reflection;
 using System.Windows.Forms;
+using FreeScreenshot.Core.Config;
 using FreeScreenshot.Core.Localization;
 using Application = System.Windows.Application;
 
 namespace FreeScreenshot;
 
-/// <summary>
-/// Tray host using the classic System.Windows.Forms.NotifyIcon — bulletproof
-/// since .NET Framework 1.0. The icon is extracted from the .exe itself
-/// (we set ApplicationIcon in the csproj), so we never touch pack URIs.
-/// </summary>
 internal sealed class TrayHost : IDisposable
 {
     private readonly App _app;
     private readonly NotifyIcon _icon;
+    private string? _lastToastPath;
     private bool _disposed;
 
     public TrayHost(App app)
@@ -33,6 +31,14 @@ internal sealed class TrayHost : IDisposable
         {
             if (e.Button == MouseButtons.Left) OpenSettings();
         };
+        _icon.BalloonTipClicked += (_, _) =>
+        {
+            // Clicking a "capture saved" toast opens the file.
+            if (!string.IsNullOrEmpty(_lastToastPath) && File.Exists(_lastToastPath))
+            {
+                TryOpen(_lastToastPath);
+            }
+        };
     }
 
     public void ShowStartupBalloon()
@@ -42,30 +48,36 @@ internal sealed class TrayHost : IDisposable
             _icon.BalloonTipTitle = Strings.T("tray.balloon.title");
             _icon.BalloonTipText  = Strings.T("tray.balloon.message");
             _icon.BalloonTipIcon  = ToolTipIcon.Info;
+            _lastToastPath = null;
             _icon.ShowBalloonTip(5000);
         }
-        catch
-        {
-            // Some Windows configurations disable toast notifications entirely. Fail silently.
-        }
+        catch { }
     }
 
-    /// <summary>Generic toast for capture results, errors, etc.</summary>
-    public void ShowToast(string title, string body, ToolTipIcon icon = ToolTipIcon.Info)
+    /// <summary>Show a toast. If filePath is set, clicking the toast opens that file.</summary>
+    public void ShowToast(string title, string body, string? filePath = null, ToolTipIcon icon = ToolTipIcon.Info)
     {
         try
         {
+            _lastToastPath = filePath;
             _icon.BalloonTipTitle = title;
             _icon.BalloonTipText  = body;
             _icon.BalloonTipIcon  = icon;
             _icon.ShowBalloonTip(4000);
         }
-        catch { /* swallow */ }
+        catch { }
+    }
+
+    /// <summary>Rebuild the context menu (call after AppConfig changes / new history item).</summary>
+    public void RefreshMenu()
+    {
+        var existing = _icon.ContextMenuStrip;
+        _icon.ContextMenuStrip = BuildMenu();
+        existing?.Dispose();
     }
 
     private static Icon LoadIcon()
     {
-        // The .ico is embedded in the .exe as ApplicationIcon — extract it from ourselves.
         var exePath = Process.GetCurrentProcess().MainModule?.FileName
                       ?? Assembly.GetExecutingAssembly().Location;
         var icon = Icon.ExtractAssociatedIcon(exePath);
@@ -75,6 +87,41 @@ internal sealed class TrayHost : IDisposable
     private ContextMenuStrip BuildMenu()
     {
         var menu = new ContextMenuStrip();
+
+        // Recent captures submenu.
+        var history = _app.Config.RecentCaptures;
+        var historyMenu = new ToolStripMenuItem(Strings.T("history.menu_header"));
+        if (history.Count == 0)
+        {
+            var empty = new ToolStripMenuItem(Strings.T("history.empty")) { Enabled = false };
+            historyMenu.DropDownItems.Add(empty);
+        }
+        else
+        {
+            foreach (var path in history.Take(8))
+            {
+                var label = Path.GetFileName(path);
+                var item = new ToolStripMenuItem(label);
+                var captured = path; // closure
+                item.Click += (_, _) => TryOpen(captured);
+                if (!File.Exists(path)) item.Enabled = false;
+                historyMenu.DropDownItems.Add(item);
+            }
+            historyMenu.DropDownItems.Add(new ToolStripSeparator());
+            var openFolder = new ToolStripMenuItem(Strings.T("history.open_folder"));
+            openFolder.Click += (_, _) =>
+            {
+                var folder = !string.IsNullOrWhiteSpace(_app.Config.CaptureFolder)
+                    ? _app.Config.CaptureFolder!
+                    : Core.Capture.GdiCaptureEngine.DefaultSaveFolder;
+                Directory.CreateDirectory(folder);
+                TryOpen(folder);
+            };
+            historyMenu.DropDownItems.Add(openFolder);
+        }
+        menu.Items.Add(historyMenu);
+        menu.Items.Add(new ToolStripSeparator());
+
         menu.Items.Add(Strings.T("menu.settings"), null, (_, _) => OpenSettings());
         menu.Items.Add(Strings.T("menu.about"),    null, (_, _) => OpenAbout());
         menu.Items.Add(new ToolStripSeparator());
@@ -98,13 +145,12 @@ internal sealed class TrayHost : IDisposable
         new MainWindow().Show();
     }
 
-    private static void OpenDonation()
+    private static void OpenDonation() => TryOpen(Strings.DonationUrl);
+
+    private static void TryOpen(string pathOrUrl)
     {
-        try
-        {
-            Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true });
-        }
-        catch { /* best effort */ }
+        try { Process.Start(new ProcessStartInfo(pathOrUrl) { UseShellExecute = true }); }
+        catch { }
     }
 
     public void Dispose()

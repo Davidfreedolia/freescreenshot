@@ -50,7 +50,63 @@
           </ComboBox>
         </DockPanel>
 
-        <TextBlock x:Name="GenPlaceholder" Foreground="{DynamicResource Brush.Text.Muted}" TextWrapping="Wrap"/>
+        <Separator Margin="0,16,0,16" Background="{DynamicResource Brush.Border.Subtle}"/>
+
+        <TextBlock x:Name="OutH" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+        <DockPanel LastChildFill="True" Margin="0,4,0,8">
+          <TextBlock x:Name="OutFolderLbl" DockPanel.Dock="Left" VerticalAlignment="Center"
+                     MinWidth="160" Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
+          <Button x:Name="OutOpenBtn" DockPanel.Dock="Right" Margin="8,0,0,0" Padding="10,6"
+                  Click="OnOpenCaptureFolder"
+                  Background="{DynamicResource Brush.Bg.Surface2}"
+                  Foreground="{DynamicResource Brush.Text.Primary}"
+                  BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
+          <Button x:Name="OutBrowseBtn" DockPanel.Dock="Right" Margin="8,0,0,0" Padding="10,6"
+                  Click="OnBrowseCaptureFolder"
+                  Background="{DynamicResource Brush.Bg.Surface2}"
+                  Foreground="{DynamicResource Brush.Text.Primary}"
+                  BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
+          <TextBlock x:Name="CaptureFolderText" VerticalAlignment="Center"
+                     FontFamily="{DynamicResource Font.Mono}"
+                     Foreground="{DynamicResource Brush.Text.Secondary}"
+                     TextTrimming="CharacterEllipsis"/>
+        </DockPanel>
+
+        <Separator Margin="0,20,0,16" Background="{DynamicResource Brush.Border.Subtle}"/>
+
+        <TextBlock x:Name="CapH" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
+
+        <Border Background="{DynamicResource Brush.Bg.Surface1}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1"
+                CornerRadius="10" Padding="14" Margin="0,4,0,8">
+          <DockPanel LastChildFill="True">
+            <CheckBox x:Name="EditorToggle" DockPanel.Dock="Right" VerticalAlignment="Center"
+                      Margin="16,0,0,0"
+                      Checked="OnEditorChanged" Unchecked="OnEditorChanged"/>
+            <StackPanel>
+              <TextBlock x:Name="EditorTitle" FontWeight="SemiBold"/>
+              <TextBlock x:Name="EditorDesc" Foreground="{DynamicResource Brush.Text.Muted}"
+                         Margin="0,2,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <Border Background="{DynamicResource Brush.Bg.Surface1}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1"
+                CornerRadius="10" Padding="14">
+          <DockPanel LastChildFill="True">
+            <CheckBox x:Name="SoundToggle" DockPanel.Dock="Right" VerticalAlignment="Center"
+                      Margin="16,0,0,0"
+                      Checked="OnSoundChanged" Unchecked="OnSoundChanged"/>
+            <StackPanel>
+              <TextBlock x:Name="SoundTitle" FontWeight="SemiBold"/>
+              <TextBlock x:Name="SoundDesc" Foreground="{DynamicResource Brush.Text.Muted}"
+                         Margin="0,2,0,0" TextWrapping="Wrap"/>
+            </StackPanel>
+          </DockPanel>
+        </Border>
+
+        <TextBlock x:Name="GenPlaceholder" Foreground="{DynamicResource Brush.Text.Muted}" TextWrapping="Wrap" Margin="0,16,0,0"/>
       </StackPanel>
 
       <!-- Privacy -->

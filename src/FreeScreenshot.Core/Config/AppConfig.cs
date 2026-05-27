@@ -31,6 +31,26 @@ public sealed class AppConfig
     [JsonPropertyName("lang")]
     public string? Lang { get; set; }
 
+    /// <summary>Folder where captured screenshots are written. Null = ~/Pictures/FreeScreenshot.</summary>
+    [JsonPropertyName("capture_folder")]
+    public string? CaptureFolder { get; set; }
+
+    /// <summary>Onboarding done flag — drives the first-run welcome window.</summary>
+    [JsonPropertyName("onboarding_done")]
+    public bool OnboardingDone { get; set; }
+
+    /// <summary>List of recent capture file paths (most recent first).</summary>
+    [JsonPropertyName("recent_captures")]
+    public List<string> RecentCaptures { get; set; } = new();
+
+    /// <summary>Open the annotation editor after capture (off = direct save+clipboard).</summary>
+    [JsonPropertyName("auto_open_editor")]
+    public bool AutoOpenEditor { get; set; }
+
+    /// <summary>Play a soft shutter sound on capture.</summary>
+    [JsonPropertyName("play_sound")]
+    public bool PlaySound { get; set; }
+
     public static string ConfigDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FreeScreenshot");
 
