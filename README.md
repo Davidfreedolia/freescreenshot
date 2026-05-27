@@ -4,8 +4,8 @@
 
 **Captures sense embuts. Screenshots without the fuss.**
 
-Eina de captura de pantalla per Windows. Gratuïta, open source, sense compte ni núvol.
-A screenshot tool for Windows. Free, open source, no account, no cloud.
+Eina de captura de pantalla per Windows. Gratuïta, open source. Les captures viuen al teu ordinador; només compartim amb freedolia.com (opt-in) la descàrrega, la primera arrencada i l'enquesta de desinstal·lació. Mira la [política de privadesa](PRIVADESA.md).
+A screenshot tool for Windows. Free, open source. Screenshots stay on your machine; we only share with freedolia.com (opt-in) the download, first-launch ping, and uninstall survey. See [privacy policy](PRIVADESA.md).
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-A3E635.svg)](LICENSE)
 [![.NET](https://img.shields.io/badge/.NET-8.0-A3E635.svg)](https://dotnet.microsoft.com/)
@@ -29,7 +29,7 @@ A screenshot tool for Windows. Free, open source, no account, no cloud.
 - OCR (extreure text de la captura)
 - Gravació de vídeo i GIF
 - Historial local
-- Tot offline, sense compte, sense núvol
+- Captures locals; cap pujada automàtica al núvol
 
 ### Estat
 
@@ -75,7 +75,7 @@ Si t'agrada i el fas servir, considera donar suport via [Stripe](#). Sense press
 - OCR (extract text from screenshots)
 - Video and GIF recording
 - Local history
-- Fully offline, no account, no cloud
+- Screenshots stay local; no automatic cloud uploads
 
 ### Status
 
