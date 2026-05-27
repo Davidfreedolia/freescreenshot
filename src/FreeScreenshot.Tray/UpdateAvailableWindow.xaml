@@ -1,0 +1,55 @@
+<Window x:Class="FreeScreenshot.UpdateAvailableWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FreeScreenshot — Nova versió"
+        Width="480" Height="280"
+        WindowStartupLocation="CenterScreen"
+        Background="{DynamicResource Brush.Bg.Base}"
+        FontFamily="{DynamicResource Font.Ui}"
+        Foreground="{DynamicResource Brush.Text.Primary}"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Topmost="True"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True">
+
+  <Grid Margin="32,28,32,24">
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+
+    <TextBlock Grid.Row="0" FontSize="11" Foreground="{DynamicResource Brush.Text.Muted}"
+               Text="ACTUALITZACIÓ DISPONIBLE"/>
+
+    <TextBlock Grid.Row="1" x:Name="HeadlineText" FontSize="22" FontWeight="SemiBold"
+               Margin="0,4,0,12"
+               Text="Nova versió de FreeScreenshot"/>
+
+    <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto">
+      <TextBlock x:Name="NotesText" TextWrapping="Wrap"
+                 Foreground="{DynamicResource Brush.Text.Secondary}"
+                 LineHeight="20"/>
+    </ScrollViewer>
+
+    <DockPanel Grid.Row="3" Margin="0,16,0,0" LastChildFill="False">
+      <Button DockPanel.Dock="Right" Content="Vés a baixar-la"
+              Padding="16,8" MinWidth="148" Click="OnUpdateClick"
+              Background="{DynamicResource Brush.Accent.Base}"
+              Foreground="#FF1A1814" BorderThickness="0"
+              FontWeight="SemiBold" Cursor="Hand"/>
+      <Button DockPanel.Dock="Right" Content="Després"
+              Padding="16,8" MinWidth="92" Margin="0,0,8,0" Click="OnLaterClick"
+              Background="{DynamicResource Brush.Bg.Surface2}"
+              Foreground="{DynamicResource Brush.Text.Primary}"
+              BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
+      <Button DockPanel.Dock="Left" Content="Salta aquesta versió"
+              Padding="12,8" Click="OnSkipClick"
+              Background="Transparent"
+              Foreground="{DynamicResource Brush.Text.Muted}"
+              BorderThickness="0" Cursor="Hand"/>
+    </DockPanel>
+  </Grid>
+</Window>

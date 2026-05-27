@@ -10,11 +10,9 @@
     <AssemblyName>FreeScreenshot</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
 
-    <!-- Single-file publish friendly -->
     <PublishSingleFile Condition="'$(PublishSingleFile)' == ''">false</PublishSingleFile>
     <SelfContained Condition="'$(SelfContained)' == ''">false</SelfContained>
 
-    <!-- Branding -->
     <Product>FreeScreenshot</Product>
     <Company>Freedolia</Company>
     <Copyright>Copyright (c) Freedolia. Licensed under GPLv3.</Copyright>
@@ -24,5 +22,9 @@
   <ItemGroup>
     <ProjectReference Include="..\FreeScreenshot.Core\FreeScreenshot.Core.csproj" />
     <ProjectReference Include="..\FreeScreenshot.UI\FreeScreenshot.UI.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="H.NotifyIcon.Wpf" Version="2.2.0" />
   </ItemGroup>
 </Project>
