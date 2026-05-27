@@ -216,7 +216,7 @@ Botons només icona amb tooltip:
 > **FreeScreenshot** v0.0.1
 > Una eina de [freedolia.com](https://freedolia.com).
 >
-> Gratuïta i open source. Si t'agrada, considera donar suport: [Donar](#).
+> Gratuïta i open source. Si t'agrada, considera donar suport via [Stripe](#).
 >
 > Codi a GitHub · Llicència GPLv3 · Icones de Lucide · Tipografia Inter & JetBrains Mono.
 
@@ -224,7 +224,7 @@ Botons només icona amb tooltip:
 > **FreeScreenshot** v0.0.1
 > A tool by [freedolia.com](https://freedolia.com).
 >
-> Free and open source. If it helps you, consider supporting: [Donate](#).
+> Free and open source. If it helps you, support via [Stripe](#).
 >
 > Code on GitHub · GPLv3 License · Icons by Lucide · Inter & JetBrains Mono typefaces.
 

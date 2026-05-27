@@ -185,7 +185,7 @@ Sent el codi públic, qualsevol pot comparar amb CleanShot. Per tant:
 - **Hotkeys conflict** amb altres apps — cal UI per detectar conflictes.
 
 ### Decisions preses
-1. **Monetització:** gratuït + donacions (model tipus OBS Studio, FreeCAD, Shotcut). Botó "Donate" a Settings i a la web. Plataformes: GitHub Sponsors, Ko-fi, Buy Me a Coffee, PayPal.
+1. **Monetització:** gratuït + donacions (model tipus OBS Studio, FreeCAD, Shotcut). Botó "Donate" a Settings i a la web. Plataforma: **Stripe** (el David ja en té compte des de Freedolia).
 2. **Cloud:** ajornat. Si s'arriba a fer, només via BYOC (Bring Your Own Cloud) — l'usuari connecta el seu S3/Imgur/Dropbox. Zero infraestructura pròpia que mantenir.
 3. **Nom:** **FreeScreenshot** (definitiu). Recomanat fer cerca ràpida a EUIPO/USPTO/TMview per confirmar que ningú ja l'ha registrat com a marca; també comprovar disponibilitat del domini (freescreenshot.com, .app, .io...).
 4. **Llicència:** **Open source**. Recomanació: GPLv3 o MPL 2.0 (copyleft moderat, evita que algú agafi el codi i en faci una versió tancada de pagament sense contribuir). MIT seria més permissiu però facilita que algú s'aprofiti del teu treball comercialment sense aportar res.

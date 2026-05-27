@@ -59,7 +59,7 @@ GPLv3. Mira [LICENSE](LICENSE).
 
 ### Suport al projecte
 
-Si t'agrada i el fas servir, considera donar suport via [GitHub Sponsors](#), [Ko-fi](#) o [Buy Me a Coffee](#). Sense pressió — l'app sempre serà 100 % gratuïta.
+Si t'agrada i el fas servir, considera donar suport via [Stripe](#). Sense pressió — l'app sempre serà 100 % gratuïta.
 
 ---
 
@@ -105,7 +105,7 @@ GPLv3. See [LICENSE](LICENSE).
 
 ### Support
 
-If you use and like it, consider supporting via [GitHub Sponsors](#), [Ko-fi](#) or [Buy Me a Coffee](#). No pressure — the app will always be 100% free.
+If you use and like it, consider supporting via [Stripe](#). No pressure — the app will always be 100% free.
 
 ---
 
