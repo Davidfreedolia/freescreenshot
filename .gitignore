@@ -52,3 +52,7 @@ packages/
 
 helloworld-screenshot.png
 settings-screenshot.png
+
+installer/dist/
+publish/
+
