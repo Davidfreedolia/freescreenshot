@@ -1,8 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
-using System.Windows.Media;
 using H.NotifyIcon;
+using H.NotifyIcon.Core;
 
 namespace FreeScreenshot;
 
@@ -26,23 +25,35 @@ internal sealed class TrayHost : IDisposable
             ContextMenu = BuildMenu(),
         };
         _icon.TrayMouseDoubleClick += (_, _) => OpenSettings();
+
+        // Force the icon to materialise immediately — otherwise it may stay
+        // un-rendered until the first system tray refresh.
+        _icon.ForceCreate();
     }
 
-    public void Show()
+    /// <summary>Shows a first-run balloon so the user knows where the app went.</summary>
+    public void ShowStartupBalloon()
     {
-        // The icon appears as soon as it's constructed; no explicit show call needed.
-        // We intentionally skip a startup balloon — quieter UX, the icon is enough.
+        try
+        {
+            _icon.ShowNotification(
+                title: "FreeScreenshot",
+                message: "Visc a la safata. Clica dret sobre la icona per opcions.",
+                icon: NotificationIcon.Info);
+        }
+        catch
+        {
+            // Older Windows versions or restricted notification policies — fail silently.
+        }
     }
 
     private ContextMenu BuildMenu()
     {
         var menu = new ContextMenu();
-
         menu.Items.Add(MakeItem("Configuració…", "Ctrl+,", OnSettingsClick));
-        menu.Items.Add(MakeItem("Quant a", null, OnAboutClick));
+        menu.Items.Add(MakeItem("Quant a",          null,    OnAboutClick));
         menu.Items.Add(new Separator());
-        menu.Items.Add(MakeItem("Sortir", null, OnQuitClick));
-
+        menu.Items.Add(MakeItem("Sortir",           null,    OnQuitClick));
         return menu;
     }
 
@@ -57,31 +68,19 @@ internal sealed class TrayHost : IDisposable
     private void OnSettingsClick(object sender, RoutedEventArgs e) => OpenSettings();
     private void OnAboutClick(object sender, RoutedEventArgs e) => OpenAbout();
 
-    private void OnQuitClick(object sender, RoutedEventArgs e)
-    {
-        // Closing the application — the OnExit handler in App will tear the tray down.
-        _app.Shutdown();
-    }
+    private void OnQuitClick(object sender, RoutedEventArgs e) => _app.Shutdown();
 
     private static void OpenSettings()
     {
         var existing = Application.Current.Windows.OfType<SettingsWindow>().FirstOrDefault();
-        if (existing is not null)
-        {
-            existing.Activate();
-            return;
-        }
+        if (existing is not null) { existing.Activate(); return; }
         new SettingsWindow().Show();
     }
 
     private static void OpenAbout()
     {
         var existing = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
-        if (existing is not null)
-        {
-            existing.Activate();
-            return;
-        }
+        if (existing is not null) { existing.Activate(); return; }
         new MainWindow().Show();
     }
 

@@ -11,7 +11,7 @@ public partial class App : Application
     private const string SingleInstanceMutexName = @"Global\Freedolia.FreeScreenshot.Singleton";
 
     private Mutex? _instanceMutex;
-    private TrayHost? _tray;
+    internal TrayHost? _tray;
     public AppConfig Config { get; private set; } = new();
     public TelemetryClient? Telemetry { get; private set; }
 
@@ -49,7 +49,13 @@ public partial class App : Application
 
         // ---- Tray ----
         _tray = new TrayHost(this);
-        _tray.Show();
+        // First-run balloon so the user can find the icon.
+        if (string.IsNullOrWhiteSpace(Config.ConsentedPrivacyVersion))
+        {
+            _tray.ShowStartupBalloon();
+            Config.ConsentedPrivacyVersion = "v1";
+            Config.Save();
+        }
 
         // ---- Optional CLI flag: --settings opens Settings on launch.
         // Useful for pinned shortcuts and for first-run UX.
