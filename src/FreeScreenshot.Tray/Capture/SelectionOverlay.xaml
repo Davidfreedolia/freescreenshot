@@ -1,0 +1,44 @@
+<Window x:Class="FreeScreenshot.Capture.SelectionOverlay"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="FreeScreenshot — selecció"
+        WindowStyle="None"
+        AllowsTransparency="True"
+        Background="Transparent"
+        ShowInTaskbar="False"
+        Topmost="True"
+        ResizeMode="NoResize"
+        WindowStartupLocation="Manual"
+        UseLayoutRounding="True"
+        SnapsToDevicePixels="True"
+        Cursor="Cross"
+        KeyDown="OnKeyDown"
+        MouseLeftButtonDown="OnMouseDown"
+        MouseMove="OnMouseMove"
+        MouseLeftButtonUp="OnMouseUp">
+  <Canvas x:Name="Root" Background="Transparent">
+    <Rectangle x:Name="DimTop"    Fill="#8C141210"/>
+    <Rectangle x:Name="DimBottom" Fill="#8C141210"/>
+    <Rectangle x:Name="DimLeft"   Fill="#8C141210"/>
+    <Rectangle x:Name="DimRight"  Fill="#8C141210"/>
+
+    <Rectangle x:Name="SelBorder"
+               Stroke="#FFA3E635" StrokeThickness="1"
+               Visibility="Collapsed"/>
+
+    <Border x:Name="SizeChip" Background="#FF25221E"
+            BorderBrush="#FF524C44" BorderThickness="1"
+            CornerRadius="4" Padding="6,3"
+            Visibility="Collapsed">
+      <TextBlock x:Name="SizeText" Foreground="#FFF5F2EC"
+                 FontFamily="Cascadia Mono, Consolas, monospace"
+                 FontSize="11"/>
+    </Border>
+
+    <Border x:Name="HintBar" Background="#E625221E"
+            BorderBrush="#FF524C44" BorderThickness="1"
+            CornerRadius="9999" Padding="14,8">
+      <TextBlock x:Name="HintText" Foreground="#FFF5F2EC" FontSize="12"/>
+    </Border>
+  </Canvas>
+</Window>

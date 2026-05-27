@@ -14,9 +14,10 @@ Si no veus la icona, prem la fletxa cap amunt (^) per expandir la safata, i arro
 Com es fa servir
 ================
 
-* Clic dret sobre la icona  → menú amb Configuració, Quant a, Donar i Sortir.
-* Doble clic                 → obre la finestra de Configuració.
-* Properes versions afegiran les dreceres de captura (Ctrl+Shift+1, Ctrl+Shift+2, ...).
+* Drecera Ctrl+Shift+1       → captura una àrea de la pantalla. Arrossega per seleccionar, Esc per cancel·lar.
+                                La captura es desa a Imatges\FreeScreenshot i es copia al portapapers.
+* Clic dret sobre la icona   → menú amb Configuració, Quant a, Donar i Sortir.
+* Doble clic                  → obre la finestra de Configuració.
 
 
 Privadesa

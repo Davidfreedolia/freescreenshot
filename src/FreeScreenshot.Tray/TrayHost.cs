@@ -50,6 +50,19 @@ internal sealed class TrayHost : IDisposable
         }
     }
 
+    /// <summary>Generic toast for capture results, errors, etc.</summary>
+    public void ShowToast(string title, string body, ToolTipIcon icon = ToolTipIcon.Info)
+    {
+        try
+        {
+            _icon.BalloonTipTitle = title;
+            _icon.BalloonTipText  = body;
+            _icon.BalloonTipIcon  = icon;
+            _icon.ShowBalloonTip(4000);
+        }
+        catch { /* swallow */ }
+    }
+
     private static Icon LoadIcon()
     {
         // The .ico is embedded in the .exe as ApplicationIcon — extract it from ourselves.

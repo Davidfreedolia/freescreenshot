@@ -2,6 +2,7 @@ using System.IO;
 using System.Reflection;
 using System.Threading;
 using System.Windows;
+using FreeScreenshot.Capture;
 using FreeScreenshot.Core.Config;
 using FreeScreenshot.Core.Localization;
 using FreeScreenshot.Core.Telemetry;
@@ -16,6 +17,7 @@ public partial class App : Application
 
     private Mutex? _instanceMutex;
     internal TrayHost? _tray;
+    private CaptureManager? _capture;
     public AppConfig Config { get; private set; } = new();
     public TelemetryClient? Telemetry { get; private set; }
 
@@ -89,6 +91,10 @@ public partial class App : Application
         if (e.Args.Any(a => a.Equals("--settings", StringComparison.OrdinalIgnoreCase)))
             new SettingsWindow().Show();
 
+        // Wire up the capture hotkey AFTER the tray exists (so toasts can use it).
+        _capture = new CaptureManager((title, body) =>
+            _tray?.ShowToast(title, body));
+
         _ = Task.Run(BackgroundStartupTasksAsync);
     }
 
@@ -151,6 +157,7 @@ public partial class App : Application
 
     protected override void OnExit(ExitEventArgs e)
     {
+        _capture?.Dispose();
         _tray?.Dispose();
         _instanceMutex?.ReleaseMutex();
         _instanceMutex?.Dispose();

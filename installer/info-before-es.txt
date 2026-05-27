@@ -14,9 +14,10 @@ Si no ves el icono, pulsa la flecha hacia arriba (^) para expandir la bandeja, y
 Cómo se usa
 ===========
 
+* Atajo Ctrl+Shift+1           → captura un área de la pantalla. Arrastra para seleccionar, Esc para cancelar.
+                                  La captura se guarda en Imágenes\FreeScreenshot y se copia al portapapeles.
 * Clic derecho sobre el icono  → menú con Configuración, Acerca de, Donar y Salir.
 * Doble clic                   → abre la ventana de Configuración.
-* Próximas versiones añadirán los atajos de captura (Ctrl+Shift+1, Ctrl+Shift+2, ...).
 
 
 Privacidad

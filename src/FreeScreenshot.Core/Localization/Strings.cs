@@ -80,6 +80,11 @@ public static class Strings
             ["uninstall.send"] = "Enviar i tancar",
             ["uninstall.skip"] = "Saltar",
             ["common.close"] = "Tancar",
+            ["capture.hint"] = "Arrossega per seleccionar · Esc per cancel·lar",
+            ["capture.toast.saved.title"] = "Captura desada",
+            ["capture.toast.saved.body"] = "{0} · {1} · al portapapers",
+            ["capture.error.title"] = "FreeScreenshot",
+            ["capture.error.hotkey_busy"] = "Ctrl+Shift+1 ja la fa servir una altra app. Canvia-la a Configuració.",
         },
         ["es"] = new()
         {
@@ -126,6 +131,11 @@ public static class Strings
             ["uninstall.send"] = "Enviar y cerrar",
             ["uninstall.skip"] = "Saltar",
             ["common.close"] = "Cerrar",
+            ["capture.hint"] = "Arrastra para seleccionar · Esc para cancelar",
+            ["capture.toast.saved.title"] = "Captura guardada",
+            ["capture.toast.saved.body"] = "{0} · {1} · en el portapapeles",
+            ["capture.error.title"] = "FreeScreenshot",
+            ["capture.error.hotkey_busy"] = "Ctrl+Shift+1 ya está en uso por otra app. Cámbiala en Configuración.",
         },
         ["en"] = new()
         {
@@ -172,6 +182,11 @@ public static class Strings
             ["uninstall.send"] = "Send and close",
             ["uninstall.skip"] = "Skip",
             ["common.close"] = "Close",
+            ["capture.hint"] = "Drag to select · Esc to cancel",
+            ["capture.toast.saved.title"] = "Screenshot saved",
+            ["capture.toast.saved.body"] = "{0} · {1} · copied to clipboard",
+            ["capture.error.title"] = "FreeScreenshot",
+            ["capture.error.hotkey_busy"] = "Ctrl+Shift+1 is already in use by another app. Change it in Settings.",
         },
     };
 }

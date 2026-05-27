@@ -6,7 +6,7 @@
 ; Outputs installer\dist\Setup_FreeScreenshot.exe
 
 #define MyAppName        "FreeScreenshot"
-#define MyAppVersion     "0.0.3"
+#define MyAppVersion     "1.0.0"
 #define MyAppPublisher   "Freedolia"
 #define MyAppURL         "https://freedolia.com"
 #define MyAppExeName     "FreeScreenshot.exe"

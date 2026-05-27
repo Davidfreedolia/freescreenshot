@@ -14,9 +14,10 @@ If you don't see the icon, click the up-arrow (^) to expand the tray and drag th
 How to use it
 =============
 
+* Ctrl+Shift+1          → capture a screen area. Drag to select, Esc to cancel.
+                          The screenshot is saved to Pictures\FreeScreenshot and copied to the clipboard.
 * Right-click the icon  → menu with Settings, About, Donate, and Quit.
 * Double-click          → opens the Settings window.
-* Future versions will add capture shortcuts (Ctrl+Shift+1, Ctrl+Shift+2, ...).
 
 
 Privacy
