@@ -52,9 +52,11 @@ public partial class SettingsWindow : Window
         OutFolderLbl.Text = Strings.T("settings.output.folder");
         OutBrowseBtn.Content = Strings.T("settings.output.browse");
         OutOpenBtn.Content = Strings.T("settings.output.open");
-        CaptureFolderText.Text = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+        var folderPath = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
             ? _config.CaptureFolder!
             : GdiCaptureEngine.DefaultSaveFolder;
+        CaptureFolderText.Text = folderPath;
+        CaptureFolderText.ToolTip = folderPath; // full path on hover for truncated cases
 
         // Capture options
         CapH.Text = Strings.T("settings.capture.heading");
@@ -144,6 +146,7 @@ public partial class SettingsWindow : Window
             _config.CaptureFolder = dlg.SelectedPath;
             _config.Save();
             CaptureFolderText.Text = dlg.SelectedPath;
+            CaptureFolderText.ToolTip = dlg.SelectedPath;
         }
     }
 

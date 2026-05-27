@@ -58,4 +58,38 @@
   <FontFamily x:Key="Font.Ui">Segoe UI Variable Display, Segoe UI, system-ui</FontFamily>
   <FontFamily x:Key="Font.Mono">Cascadia Mono, Consolas, monospace</FontFamily>
 
+  <!-- Dark ComboBox style -->
+  <Style TargetType="ComboBox">
+    <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface2}"/>
+    <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border.Subtle}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="10,6"/>
+    <Setter Property="FontSize" Value="13"/>
+  </Style>
+
+  <Style TargetType="ComboBoxItem">
+    <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface1}"/>
+    <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+    <Setter Property="Padding" Value="8,6"/>
+    <Style.Triggers>
+      <Trigger Property="IsHighlighted" Value="True">
+        <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface3}"/>
+      </Trigger>
+    </Style.Triggers>
+  </Style>
+
+  <Style TargetType="TextBox">
+    <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface2}"/>
+    <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border.Subtle}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="8,6"/>
+    <Setter Property="CaretBrush" Value="{StaticResource Brush.Accent.Base}"/>
+  </Style>
+
+  <Style TargetType="ScrollBar">
+    <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface1}"/>
+  </Style>
+
 </ResourceDictionary>

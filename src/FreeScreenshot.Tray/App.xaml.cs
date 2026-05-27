@@ -42,6 +42,9 @@ public partial class App : Application
             ex.Handled = true;
         };
 
+        // Apply dark title bar to every Window the app shows.
+        FreeScreenshot.UI.DarkTitleBar.HookAll();
+
         Config = AppConfig.Load();
         Config.EnsureInstallId();
         if (!string.IsNullOrWhiteSpace(Config.Lang)) Strings.SetLang(Config.Lang!);

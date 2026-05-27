@@ -53,24 +53,22 @@
         <Separator Margin="0,16,0,16" Background="{DynamicResource Brush.Border.Subtle}"/>
 
         <TextBlock x:Name="OutH" FontSize="14" FontWeight="SemiBold" Margin="0,0,0,8"/>
-        <DockPanel LastChildFill="True" Margin="0,4,0,8">
-          <TextBlock x:Name="OutFolderLbl" DockPanel.Dock="Left" VerticalAlignment="Center"
-                     MinWidth="160" Foreground="{DynamicResource Brush.Text.Primary}" FontWeight="SemiBold"/>
-          <Button x:Name="OutOpenBtn" DockPanel.Dock="Right" Margin="8,0,0,0" Padding="10,6"
-                  Click="OnOpenCaptureFolder"
+        <TextBlock x:Name="OutFolderLbl" Foreground="{DynamicResource Brush.Text.Primary}"
+                   FontWeight="SemiBold" Margin="0,4,0,4"/>
+        <TextBlock x:Name="CaptureFolderText" Margin="0,0,0,8"
+                   FontFamily="{DynamicResource Font.Mono}" FontSize="12"
+                   Foreground="{DynamicResource Brush.Text.Secondary}"
+                   TextTrimming="CharacterEllipsis" ToolTipService.ShowDuration="20000"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+          <Button x:Name="OutBrowseBtn" Padding="10,6" Margin="0,0,8,0" Click="OnBrowseCaptureFolder"
                   Background="{DynamicResource Brush.Bg.Surface2}"
                   Foreground="{DynamicResource Brush.Text.Primary}"
                   BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
-          <Button x:Name="OutBrowseBtn" DockPanel.Dock="Right" Margin="8,0,0,0" Padding="10,6"
-                  Click="OnBrowseCaptureFolder"
+          <Button x:Name="OutOpenBtn" Padding="10,6" Click="OnOpenCaptureFolder"
                   Background="{DynamicResource Brush.Bg.Surface2}"
                   Foreground="{DynamicResource Brush.Text.Primary}"
                   BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
-          <TextBlock x:Name="CaptureFolderText" VerticalAlignment="Center"
-                     FontFamily="{DynamicResource Font.Mono}"
-                     Foreground="{DynamicResource Brush.Text.Secondary}"
-                     TextTrimming="CharacterEllipsis"/>
-        </DockPanel>
+        </StackPanel>
 
         <Separator Margin="0,20,0,16" Background="{DynamicResource Brush.Border.Subtle}"/>
 
