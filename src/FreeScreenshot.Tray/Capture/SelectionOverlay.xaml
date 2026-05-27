@@ -35,10 +35,10 @@
                  FontSize="11"/>
     </Border>
 
-    <Border x:Name="HintBar" Background="#E625221E"
-            BorderBrush="#FF524C44" BorderThickness="1"
-            CornerRadius="9999" Padding="14,8">
-      <TextBlock x:Name="HintText" Foreground="#FFF5F2EC" FontSize="12"/>
-    </Border>
+    <TextBlock x:Name="HintText" Foreground="#FFF5F2EC" FontSize="14" FontWeight="SemiBold">
+      <TextBlock.Effect>
+        <DropShadowEffect Color="#FF000000" Opacity="0.85" BlurRadius="8" ShadowDepth="0"/>
+      </TextBlock.Effect>
+    </TextBlock>
   </Canvas>
 </Window>

@@ -7,6 +7,7 @@ using Key = System.Windows.Input.Key;
 using MouseButtonEventArgs = System.Windows.Input.MouseButtonEventArgs;
 using MouseEventArgs = System.Windows.Input.MouseEventArgs;
 using Point = System.Windows.Point;
+using Size = System.Windows.Size;
 
 namespace FreeScreenshot.Capture;
 
@@ -37,8 +38,9 @@ public partial class SelectionOverlay : Window
             Focus();
             UpdateLayoutForRect(default);
             HintText.Text = Strings.T("capture.hint");
-            Canvas.SetLeft(HintBar, (Width - 320) / 2);
-            Canvas.SetTop(HintBar, 24);
+            HintText.Measure(new Size(double.PositiveInfinity, double.PositiveInfinity));
+            Canvas.SetLeft(HintText, (Width - HintText.DesiredSize.Width) / 2);
+            Canvas.SetTop(HintText, 28);
         };
     }
 
@@ -57,7 +59,7 @@ public partial class SelectionOverlay : Window
     {
         _start = e.GetPosition(Root);
         _dragging = true;
-        HintBar.Visibility = Visibility.Collapsed;
+        HintText.Visibility = Visibility.Collapsed;
         SelBorder.Visibility = Visibility.Visible;
         SizeChip.Visibility = Visibility.Visible;
         CaptureMouse();

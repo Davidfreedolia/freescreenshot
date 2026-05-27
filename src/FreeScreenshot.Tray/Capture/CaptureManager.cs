@@ -149,12 +149,8 @@ internal sealed class CaptureManager : IDisposable
                 case FloatingToolbar.Action.Pin:
                     {
                         CopyPngToClipboard(png);
-                        // Place pinned near where the selection ended.
-                        var px = selectionDips is { } s ? SystemParameters.VirtualScreenLeft + s.X : 100;
-                        var py = selectionDips is { } s2 ? SystemParameters.VirtualScreenTop + s2.Y : 100;
-                        var pin = new PinnedWindow(png, px, py);
+                        var pin = new PinnedWindow(png);
                         pin.Show();
-                        // Also save to disk so it persists.
                         var path = SaveAndToast(png, phys.W, phys.H);
                         NotifyCaptureSaved(path);
                         return;
