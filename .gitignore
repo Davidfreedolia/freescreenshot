@@ -49,3 +49,5 @@ appsettings.Development.json
 *.nupkg
 packages/
 .nuget/
+
+helloworld-screenshot.png

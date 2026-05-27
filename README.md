@@ -43,7 +43,7 @@ Pre-alfa. El projecte arrenca el 2026. Mira [docs/ROADMAP.md](docs/ROADMAP.md) p
 ### Posar-se en marxa (desenvolupadors)
 
 ```powershell
-git clone https://github.com/freedolia/freescreenshot.git
+git clone https://github.com/Davidfreedolia/freescreenshot.git
 cd freescreenshot
 dotnet build
 dotnet run --project src/FreeScreenshot.Tray
@@ -89,7 +89,7 @@ Pre-alpha. Project kick-off in 2026. See [docs/ROADMAP.md](docs/ROADMAP.md).
 ### Getting started (developers)
 
 ```powershell
-git clone https://github.com/freedolia/freescreenshot.git
+git clone https://github.com/Davidfreedolia/freescreenshot.git
 cd freescreenshot
 dotnet build
 dotnet run --project src/FreeScreenshot.Tray
