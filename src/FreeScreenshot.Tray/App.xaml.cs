@@ -80,15 +80,7 @@ public partial class App : Application
         _capture = new CaptureManager(Config, (title, body, path) =>
         {
             _tray?.ShowToast(title, body, path);
-            if (!string.IsNullOrEmpty(path))
-            {
-                // Remember in history (most-recent first, capped at 20).
-                Config.RecentCaptures.Remove(path);
-                Config.RecentCaptures.Insert(0, path);
-                while (Config.RecentCaptures.Count > 20) Config.RecentCaptures.RemoveAt(Config.RecentCaptures.Count - 1);
-                Config.Save();
-                _tray?.RefreshMenu();
-            }
+            if (!string.IsNullOrEmpty(path)) _tray?.RefreshMenu();
         });
 
         if (e.Args.Any(a => a.Equals("--settings", StringComparison.OrdinalIgnoreCase)))

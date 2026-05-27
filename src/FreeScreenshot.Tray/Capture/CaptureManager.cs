@@ -29,12 +29,10 @@ internal sealed class CaptureManager : IDisposable
         _config = config;
         _toast = showToast;
         var mods = GlobalHotkey.Modifiers.Ctrl | GlobalHotkey.Modifiers.Shift;
-
         if (_hotkeys.Register(mods, VK_1, () => Trigger(CaptureMode.Area)) == 0)
         {
             _toast(Strings.T("capture.error.title"), Strings.T("capture.error.hotkey_busy"), null);
         }
-        // Best-effort: Ctrl+Shift+3 for full-screen capture.
         _hotkeys.Register(mods, VK_3, () => Trigger(CaptureMode.FullScreen));
     }
 
@@ -54,11 +52,12 @@ internal sealed class CaptureManager : IDisposable
         }
     }
 
-    private void RunCaptureFlow(CaptureMode mode)
+    private async void RunCaptureFlow(CaptureMode mode)
     {
         try
         {
             (int X, int Y, int W, int H) phys;
+            Rect? selectionDips = null;
 
             if (mode == CaptureMode.Area)
             {
@@ -67,10 +66,12 @@ internal sealed class CaptureManager : IDisposable
                 if (ok != true || overlay.PhysicalSelection is not { } p || p.W < 1 || p.H < 1)
                     return;
                 phys = p;
+                selectionDips = overlay.Selection;
             }
             else
             {
-                var dpi = VisualTreeHelper.GetDpi(Application.Current.MainWindow ?? new Window()).PixelsPerDip;
+                var dummy = Application.Current.MainWindow ?? new Window();
+                var dpi = VisualTreeHelper.GetDpi(dummy).PixelsPerDip;
                 phys = (
                     (int)Math.Round(SystemParameters.VirtualScreenLeft * dpi),
                     (int)Math.Round(SystemParameters.VirtualScreenTop  * dpi),
@@ -78,7 +79,6 @@ internal sealed class CaptureManager : IDisposable
                     (int)Math.Round(SystemParameters.VirtualScreenHeight * dpi));
             }
 
-            // Let the overlay un-paint before we grab.
             Application.Current.Dispatcher.Invoke(() => { }, System.Windows.Threading.DispatcherPriority.Render);
             System.Threading.Thread.Sleep(60);
 
@@ -89,39 +89,93 @@ internal sealed class CaptureManager : IDisposable
                 try { SystemSounds.Asterisk.Play(); } catch { }
             }
 
-            // Editor flow.
-            if (_config.AutoOpenEditor)
+            // The floating toolbar appears for area captures and lets the user pick the action.
+            // Full-screen + AutoOpenEditor go straight into the editor; otherwise it's save+copy.
+            FloatingToolbar.Action action;
+            if (mode == CaptureMode.Area && selectionDips is { } sel)
             {
-                var editor = new EditorWindow(png);
-                var ok = editor.ShowDialog();
-                if (ok != true || editor.EditedPng is null)
-                {
-                    return;
-                }
-                png = editor.EditedPng;
-                if (!editor.ShouldSave)
-                {
-                    // User chose Copy-only — clipboard set in editor, no toast needed.
-                    _toast(Strings.T("capture.toast.saved.title"),
-                           string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", "(portapapers)"),
-                           null);
-                    return;
-                }
+                var tb = new FloatingToolbar();
+                tb.PositionNear(sel, SystemParameters.VirtualScreenLeft, SystemParameters.VirtualScreenTop);
+                tb.ShowDialog();
+                action = tb.ChosenAction;
             }
             else
             {
-                CopyPngToClipboard(png);
+                action = _config.AutoOpenEditor ? FloatingToolbar.Action.Editor : FloatingToolbar.Action.Copy;
+                // Also save by default on fullscreen
+                if (!_config.AutoOpenEditor) action = FloatingToolbar.Action.Save;
             }
 
-            var folder = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
-                ? _config.CaptureFolder!
-                : GdiCaptureEngine.DefaultSaveFolder;
-            var path = GdiCaptureEngine.SaveToDisk(png, folder);
+            switch (action)
+            {
+                case FloatingToolbar.Action.Cancel:
+                case FloatingToolbar.Action.None:
+                    return;
 
-            _toast(
-                Strings.T("capture.toast.saved.title"),
-                string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", Path.GetFileName(path)),
-                path);
+                case FloatingToolbar.Action.Copy:
+                    CopyPngToClipboard(png);
+                    _toast(
+                        Strings.T("capture.toast.saved.title"),
+                        string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", "(portapapers)"),
+                        null);
+                    return;
+
+                case FloatingToolbar.Action.Save:
+                    CopyPngToClipboard(png);
+                    var savedPath = SaveAndToast(png, phys.W, phys.H);
+                    NotifyCaptureSaved(savedPath);
+                    return;
+
+                case FloatingToolbar.Action.Editor:
+                    {
+                        var ed = new EditorWindow(png);
+                        var ok = ed.ShowDialog();
+                        if (ok != true || ed.EditedPng is null) return;
+                        png = ed.EditedPng;
+                        if (ed.ShouldSave)
+                        {
+                            var p = SaveAndToast(png, phys.W, phys.H);
+                            NotifyCaptureSaved(p);
+                        }
+                        else
+                        {
+                            _toast(Strings.T("capture.toast.saved.title"),
+                                string.Format(Strings.T("capture.toast.saved.body"), $"{phys.W}×{phys.H}", "(portapapers)"),
+                                null);
+                        }
+                        return;
+                    }
+
+                case FloatingToolbar.Action.Pin:
+                    {
+                        CopyPngToClipboard(png);
+                        // Place pinned near where the selection ended.
+                        var px = selectionDips is { } s ? SystemParameters.VirtualScreenLeft + s.X : 100;
+                        var py = selectionDips is { } s2 ? SystemParameters.VirtualScreenTop + s2.Y : 100;
+                        var pin = new PinnedWindow(png, px, py);
+                        pin.Show();
+                        // Also save to disk so it persists.
+                        var path = SaveAndToast(png, phys.W, phys.H);
+                        NotifyCaptureSaved(path);
+                        return;
+                    }
+
+                case FloatingToolbar.Action.Ocr:
+                    {
+                        var text = await OcrHelper.ExtractAsync(png);
+                        if (string.IsNullOrEmpty(text))
+                        {
+                            _toast(Strings.T("capture.error.title"), Strings.T("ocr.empty"), null);
+                            return;
+                        }
+                        try { Clipboard.SetText(text); } catch { }
+                        _toast(
+                            Strings.T("ocr.copied.title"),
+                            string.Format(Strings.T("ocr.copied.body"), text.Length),
+                            null);
+                        return;
+                    }
+            }
         }
         catch (Exception ex)
         {
@@ -131,6 +185,27 @@ internal sealed class CaptureManager : IDisposable
         {
             _capturing = false;
         }
+    }
+
+    private string SaveAndToast(byte[] png, int w, int h)
+    {
+        var folder = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
+            ? _config.CaptureFolder!
+            : GdiCaptureEngine.DefaultSaveFolder;
+        var path = GdiCaptureEngine.SaveToDisk(png, folder);
+        _toast(
+            Strings.T("capture.toast.saved.title"),
+            string.Format(Strings.T("capture.toast.saved.body"), $"{w}×{h}", Path.GetFileName(path)),
+            path);
+        return path;
+    }
+
+    private void NotifyCaptureSaved(string path)
+    {
+        _config.RecentCaptures.Remove(path);
+        _config.RecentCaptures.Insert(0, path);
+        while (_config.RecentCaptures.Count > 20) _config.RecentCaptures.RemoveAt(_config.RecentCaptures.Count - 1);
+        _config.Save();
     }
 
     private static void CopyPngToClipboard(byte[] pngBytes)

@@ -116,6 +116,14 @@ public static class Strings
             ["editor.save"] = "Desar",
             ["editor.text.placeholder"] = "text aquí",
             ["capture.fullscreen.hint"] = "Pantalla sencera (Ctrl+Shift+3)",
+            ["toolbar.editor"] = "Obrir editor",
+            ["toolbar.pin"] = "Fixar a la pantalla",
+            ["toolbar.ocr"] = "Extreure text (OCR)",
+            ["toolbar.save"] = "Desar al disc",
+            ["toolbar.copy"] = "Copiar al portapapers",
+            ["ocr.copied.title"] = "Text extret",
+            ["ocr.copied.body"] = "{0} caràcters al portapapers",
+            ["ocr.empty"] = "No s'ha trobat text llegible.",
         },
         ["es"] = new()
         {
@@ -198,6 +206,14 @@ public static class Strings
             ["editor.save"] = "Guardar",
             ["editor.text.placeholder"] = "texto aquí",
             ["capture.fullscreen.hint"] = "Pantalla completa (Ctrl+Shift+3)",
+            ["toolbar.editor"] = "Abrir editor",
+            ["toolbar.pin"] = "Fijar en pantalla",
+            ["toolbar.ocr"] = "Extraer texto (OCR)",
+            ["toolbar.save"] = "Guardar en disco",
+            ["toolbar.copy"] = "Copiar al portapapeles",
+            ["ocr.copied.title"] = "Texto extraído",
+            ["ocr.copied.body"] = "{0} caracteres en el portapapeles",
+            ["ocr.empty"] = "No se encontró texto legible.",
         },
         ["en"] = new()
         {
@@ -280,6 +296,14 @@ public static class Strings
             ["editor.save"] = "Save",
             ["editor.text.placeholder"] = "text here",
             ["capture.fullscreen.hint"] = "Full screen (Ctrl+Shift+3)",
+            ["toolbar.editor"] = "Open editor",
+            ["toolbar.pin"] = "Pin to screen",
+            ["toolbar.ocr"] = "Extract text (OCR)",
+            ["toolbar.save"] = "Save to disk",
+            ["toolbar.copy"] = "Copy to clipboard",
+            ["ocr.copied.title"] = "Text extracted",
+            ["ocr.copied.body"] = "{0} characters on the clipboard",
+            ["ocr.empty"] = "No readable text found.",
         },
     };
 }
