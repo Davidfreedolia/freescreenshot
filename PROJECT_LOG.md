@@ -203,6 +203,16 @@ Every commit from here on **must** update `AGENTS.md` and
 `PROJECT_LOG.md` before being pushed. See the "House rule" at the top
 of `AGENTS.md` for the checklist.
 
+## v2.1.1 — Cowork handover finalized
+
+- `web/banner-home.html` "Novedad" tag bumped from v1.10 → v2.1.
+- Added `web/COWORK_BRIEF.md`: a 7-step action-only checklist for the
+  `freedolia-hub` cowork to publish Freezshot on `freedolia.com`. Covers
+  asset copy paths, the 3 landing routes, banner placement, header
+  entry, lead capture flow with the Stripe Payment Link, API route
+  verification, and QA steps. Keeps `HANDOVER.md` as the deeper
+  reference for palette/typography/CSS tokens.
+
 ## v2.1 — Clean upgrade migration, visible donation, SmartScreen guidance
 
 - **Upgrade migration in Inno Setup `[Code]` section.** When you install
