@@ -1,11 +1,16 @@
-# FreeScreenshot — handover per al cowork de `freedolia-hub`
+# Freezshot — handover per al cowork de `freedolia-hub`
 
-Aquesta carpeta (`freescreenshot/web/`) conté tot el que necessites per
-publicar **FreeScreenshot** a `freedolia.com`: banner per al home + landing
+Aquesta carpeta (`freezshot/web/`) conté tot el que necessites per
+publicar **Freezshot** a `freedolia.com`: banner per al home + landing
 en tres idiomes + assets de marca.
 
 Tot està fet seguint el mateix patró que ja vam fer servir per a FreeWisp,
 així que aquesta integració hauria d'encaixar al mateix lloc.
+
+> **Naming.** El producte ara es diu **Freezshot** (abans FreeScreenshot).
+> Els endpoints `/api/freescreenshot/*` i el bucket R2 **es queden com
+> estan** — és infra que no canviem. Tot el que veu l'usuari (landing,
+> banner, header) ha d'anar com a **Freezshot** / `/freezshot`.
 
 ---
 
@@ -13,13 +18,11 @@ així que aquesta integració hauria d'encaixar al mateix lloc.
 
 ### 1. Copiar assets al `freedolia-hub`
 
-Des d'aquest repo:
-
-| Origen (`freescreenshot/web/`) | Destí al `freedolia-hub`                              | Per a què serveix          |
-| ------------------------------ | ----------------------------------------------------- | -------------------------- |
-| `icon.svg`                     | `public/static/freescreenshot/icon.svg`               | Favicon + logo a la landing |
-| `icon.ico`                     | `public/static/freescreenshot/icon.ico`               | Favicon fallback (IE/legacy) |
-| `wordmark.svg`                 | `public/static/freescreenshot/wordmark.svg`           | Logo + text (per al header)  |
+| Origen (`freezshot/web/`) | Destí al `freedolia-hub`                  | Per a què serveix          |
+| ------------------------- | ----------------------------------------- | -------------------------- |
+| `icon.svg`                | `public/static/freezshot/icon.svg`        | Favicon + logo a la landing |
+| `icon.ico`                | `public/static/freezshot/icon.ico`        | Favicon fallback            |
+| `wordmark.svg`            | `public/static/freezshot/wordmark.svg`    | Logo + text (per al header) |
 
 Si vols generar `og.png` (imatge per a Open Graph 1200×630), exporta una
 versió de `icon.svg` centrada sobre fons `#0A1A1C` amb el wordmark.
@@ -32,9 +35,9 @@ fa servir `/es/freewisp` (header global + footer global del lloc).
 
 | Fitxer            | Ruta pública                          |
 | ----------------- | ------------------------------------- |
-| `landing-ca.html` | `freedolia.com/ca/freescreenshot`     |
-| `landing-es.html` | `freedolia.com/es/freescreenshot`     |
-| `landing-en.html` | `freedolia.com/en/freescreenshot`     |
+| `landing-ca.html` | `freedolia.com/ca/freezshot`          |
+| `landing-es.html` | `freedolia.com/es/freezshot`          |
+| `landing-en.html` | `freedolia.com/en/freezshot`          |
 
 **Important:** `landing-ca.html` i `landing-en.html` no inclouen el
 `<style>` per estalviar duplicació — agafa el bloc de CSS de
@@ -48,22 +51,22 @@ prefix `.fs-banner__*`). Va just al costat — o al lloc — del banner
 de FreeWisp del home.
 
 Si la home té un grid de productes, encaixa com a segona targeta.
-Si és un stack vertical (com el del mockup d'imatge actual), va a sota.
+Si és un stack vertical, va a sota del de FreeWisp.
 
-L'enllaç apunta a `/es/freescreenshot` per defecte. Ajusta-ho al locale
-del visitant si la teva home té detecció d'idioma (igual que la del
-banner de FreeWisp).
+L'enllaç apunta a `/es/freezshot` per defecte. Ajusta-ho al locale
+del visitant si la teva home té detecció d'idioma.
 
 ### 4. Afegir l'enllaç al navegador principal
 
 Al header global (el component que pinta `CA | ES | EN` i el menú de
-productes), afegir entrada **"FreeScreenshot"** apuntant al locale
+productes), afegir entrada **"Freezshot"** apuntant al locale
 corresponent — al costat de "FreeWisp", amb el mateix estil de pill
-verd que ja té FreeWisp.
+verd/teal que ja té FreeWisp.
 
-### 5. Routes API (ja existeixen)
+### 5. Routes API (ja existeixen, NO les canviïs)
 
-Aquestes ja les vam crear; només cal verificar que segueixen vives:
+Aquestes rutes ja estaven creades per FreeScreenshot i es queden així
+perquè l'app instal·lada hi apunta. Els endpoints són estables:
 
 - `freedolia.com/api/freescreenshot/download` → redirect a R2
 - `freedolia.com/api/freescreenshot/install`  → POST telemetria d'install
@@ -73,12 +76,13 @@ Aquestes ja les vam crear; només cal verificar que segueixen vives:
 Els rewrites estan a `vercel.json` del repo `freedolia-hub`, secció
 `rewrites`, igual que els de FreeWisp.
 
+El binari a R2 ara s'anomena `Setup_Freezshot.exe` dins del mateix bucket
+`freescreenshot`. La taula `public.freescreenshot_latest` continua sent
+la font de veritat per al "latest".
+
 ---
 
 ## Paleta i tipografia (per coherència)
-
-Si has de tocar res del CSS, fes servir aquests tokens — són els
-mateixos que usen els landings:
 
 ```css
 --fs-bg-deep:      #061214;
@@ -105,15 +109,15 @@ Border radius: `999px` per a CTAs (pill), `18-24px` per a targes,
 
 - [ ] Carrega cada landing a mòbil (≤ 720 px). El grid de features
       hauria de col·lapsar a una columna.
-- [ ] `/api/freescreenshot/download` retorna la versió 1.9 (o més
-      recent) — proveu-ho amb `curl -I`.
+- [ ] `/api/freescreenshot/download` retorna **Setup_Freezshot.exe**
+      versió 2.0 o més recent — proveu-ho amb `curl -IL`.
 - [ ] El logo (favicon) es veu bé al tab del navegador.
 - [ ] El banner del home té el hover state (lleugera elevació + accent
       al border).
 - [ ] Switch d'idioma del header navega a la landing correcta de
-      FreeScreenshot.
+      Freezshot.
 
 ---
 
 Qualsevol cosa que no quadri, els fonts originals d'imatge i SVG són
-a aquest mateix repo `freescreenshot/` a la carpeta `brand/`.
+a aquest mateix repo `freezshot/` a la carpeta `brand/`.

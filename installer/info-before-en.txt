@@ -1,4 +1,4 @@
-What is FreeScreenshot
+What is Freezshot
 
 A minimalist screenshot tool for Windows. Free, open source, gets out of your way.
 
@@ -8,14 +8,14 @@ Where it lives
 
 Once installed, the app lives in the system tray (bottom-right, near the clock).
 
-If you don't see the icon, click the up-arrow (^) to expand the tray and drag the FreeScreenshot lime icon onto the main bar so it stays visible.
+If you don't see the icon, click the up-arrow (^) to expand the tray and drag the Freezshot lime icon onto the main bar so it stays visible.
 
 
 How to use it
 =============
 
 * Ctrl+Shift+1          → capture a screen area. Drag to select, Esc to cancel.
-                          The screenshot is saved to Pictures\FreeScreenshot and copied to the clipboard.
+                          The screenshot is saved to Pictures\Freezshot and copied to the clipboard.
 * Right-click the icon  → menu with Settings, About, Donate, and Quit.
 * Double-click          → opens the Settings window.
 
@@ -23,7 +23,7 @@ How to use it
 Privacy
 =======
 
-FreeScreenshot sends three optional signals to freedolia.com: the install ping, the silent version check, and the optional uninstall survey. You can turn all of it off in Settings → Privacy.
+Freezshot sends three optional signals to freedolia.com: the install ping, the silent version check, and the optional uninstall survey. You can turn all of it off in Settings → Privacy.
 
 License: GPLv3.
 
