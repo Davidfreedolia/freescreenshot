@@ -16,6 +16,7 @@ namespace FreeScreenshot.Capture;
 internal sealed class CaptureManager : IDisposable
 {
     private const uint VK_1 = 0x31;
+    private const uint VK_2 = 0x32;
     private const uint VK_3 = 0x33;
 
     private readonly GlobalHotkey _hotkeys = new();
@@ -33,10 +34,11 @@ internal sealed class CaptureManager : IDisposable
         {
             _toast(Strings.T("capture.error.title"), Strings.T("capture.error.hotkey_busy"), null);
         }
+        _hotkeys.Register(mods, VK_2, () => Trigger(CaptureMode.Window));
         _hotkeys.Register(mods, VK_3, () => Trigger(CaptureMode.FullScreen));
     }
 
-    private enum CaptureMode { Area, FullScreen }
+    private enum CaptureMode { Area, FullScreen, Window }
 
     private void Trigger(CaptureMode mode)
     {
@@ -67,6 +69,12 @@ internal sealed class CaptureManager : IDisposable
                     return;
                 phys = p;
                 selectionDips = overlay.Selection;
+            }
+            else if (mode == CaptureMode.Window)
+            {
+                var fg = WindowFinder.GetForegroundRect();
+                if (fg is null) { _toast(Strings.T("capture.error.title"), Strings.T("capture.window.none"), null); return; }
+                phys = fg.Value;
             }
             else
             {

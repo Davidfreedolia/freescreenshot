@@ -19,7 +19,7 @@ namespace FreeScreenshot.Capture;
 
 public partial class EditorWindow : Window
 {
-    private enum Tool { Arrow, Rectangle, Text }
+    private enum Tool { Arrow, Rectangle, Text, Blur, Crop }
 
     private readonly byte[] _originalPng;
     private readonly int _widthPx;
@@ -45,6 +45,8 @@ public partial class EditorWindow : Window
         ShotImage.Source = frame;
         _widthPx = frame.PixelWidth;
         _heightPx = frame.PixelHeight;
+        _widthField = _widthPx;
+        _heightField = _heightPx;
         OverlayCanvas.Width = ShotImage.Width = _widthPx;
         OverlayCanvas.Height = ShotImage.Height = _heightPx;
 
@@ -59,6 +61,8 @@ public partial class EditorWindow : Window
     private Tool CurrentTool =>
         ToolRect.IsChecked == true ? Tool.Rectangle :
         ToolText.IsChecked == true ? Tool.Text :
+        ToolBlur.IsChecked == true ? Tool.Blur :
+        ToolCrop.IsChecked == true ? Tool.Crop :
         Tool.Arrow;
 
     private SolidColorBrush CurrentColor
@@ -115,6 +119,18 @@ public partial class EditorWindow : Window
         var p = e.GetPosition(OverlayCanvas);
         if (_preview is not null) OverlayCanvas.Children.Remove(_preview);
         _preview = null;
+
+        // Crop is special — re-render with the cropped region as the new image.
+        if (CurrentTool == Tool.Crop)
+        {
+            var x = Math.Min(_start.X, p.X);
+            var y = Math.Min(_start.Y, p.Y);
+            var w = Math.Abs(p.X - _start.X);
+            var h = Math.Abs(p.Y - _start.Y);
+            if (w >= 10 && h >= 10) DoCrop(new Rect(x, y, w, h));
+            return;
+        }
+
         var shape = BuildShape(_start, p);
         if (shape is not null)
         {
@@ -122,6 +138,40 @@ public partial class EditorWindow : Window
             _shapes.Push(shape);
         }
     }
+
+    private void DoCrop(Rect rect)
+    {
+        // Render current state to a PNG, take the cropped sub-rectangle, and
+        // reload it as the new source image. All existing annotations bake in.
+        var flat = Render();
+        using var ms = new MemoryStream(flat);
+        var decoder = BitmapDecoder.Create(ms, BitmapCreateOptions.PreservePixelFormat, BitmapCacheOption.OnLoad);
+        var src = decoder.Frames[0];
+        var ix = (int)Math.Round(rect.X);
+        var iy = (int)Math.Round(rect.Y);
+        var iw = (int)Math.Round(rect.Width);
+        var ih = (int)Math.Round(rect.Height);
+        ix = Math.Max(0, Math.Min(ix, src.PixelWidth - 1));
+        iy = Math.Max(0, Math.Min(iy, src.PixelHeight - 1));
+        iw = Math.Min(iw, src.PixelWidth - ix);
+        ih = Math.Min(ih, src.PixelHeight - iy);
+
+        var cropped = new CroppedBitmap(src, new System.Windows.Int32Rect(ix, iy, iw, ih));
+        cropped.Freeze();
+        ShotImage.Source = cropped;
+        _widthField = iw; _heightField = ih;
+        OverlayCanvas.Width = ShotImage.Width = iw;
+        OverlayCanvas.Height = ShotImage.Height = ih;
+        OverlayCanvas.Children.Clear();
+        _shapes.Clear();
+        DimensionsText.Text = $"{iw} × {ih}";
+        // Switch back to arrow tool after a crop.
+        ToolArrow.IsChecked = true;
+    }
+
+    // Mutable backing fields so crop can update the canvas size at runtime.
+    private int _widthField;
+    private int _heightField;
 
     private UIElement? BuildShape(Point a, Point b)
     {
@@ -176,6 +226,49 @@ public partial class EditorWindow : Window
                 }
                 return g;
             }
+            case Tool.Blur:
+            {
+                var w = Math.Abs(b.X - a.X);
+                var h = Math.Abs(b.Y - a.Y);
+                if (w < 6 || h < 6) return null;
+                var sx = Math.Min(a.X, b.X);
+                var sy = Math.Min(a.Y, b.Y);
+                // A clipping container with the original image offset inside — when blurred,
+                // it shows the underlying area in-place but blurred.
+                var container = new System.Windows.Controls.Canvas
+                {
+                    Width = w, Height = h, ClipToBounds = true,
+                };
+                var img = new System.Windows.Controls.Image
+                {
+                    Source = ShotImage.Source,
+                    Stretch = Stretch.None,
+                    Effect = new System.Windows.Media.Effects.BlurEffect { Radius = Math.Max(12, _widthPx * 0.012) },
+                };
+                System.Windows.Controls.Canvas.SetLeft(img, -sx);
+                System.Windows.Controls.Canvas.SetTop(img,  -sy);
+                container.Children.Add(img);
+                System.Windows.Controls.Canvas.SetLeft(container, sx);
+                System.Windows.Controls.Canvas.SetTop(container,  sy);
+                return container;
+            }
+            case Tool.Crop:
+            {
+                // Crop is applied directly on mouseUp via DoCrop(); we draw a dashed
+                // preview rectangle while dragging.
+                var pen = new SolidColorBrush(Color.FromRgb(0xA3, 0xE6, 0x35));
+                var dashed = new Rectangle
+                {
+                    Stroke = pen,
+                    StrokeThickness = 1.5,
+                    StrokeDashArray = new System.Windows.Media.DoubleCollection { 4, 3 },
+                    Width = Math.Abs(b.X - a.X),
+                    Height = Math.Abs(b.Y - a.Y),
+                };
+                System.Windows.Controls.Canvas.SetLeft(dashed, Math.Min(a.X, b.X));
+                System.Windows.Controls.Canvas.SetTop(dashed,  Math.Min(a.Y, b.Y));
+                return dashed;
+            }
             case Tool.Text:
             {
                 if (Math.Abs(b.X - a.X) < 24 || Math.Abs(b.Y - a.Y) < 14)
@@ -222,9 +315,9 @@ public partial class EditorWindow : Window
     private byte[] Render()
     {
         var grid = (FrameworkElement)CanvasHost;
-        grid.Measure(new Size(_widthPx, _heightPx));
-        grid.Arrange(new Rect(new Size(_widthPx, _heightPx)));
-        var rtb = new RenderTargetBitmap(_widthPx, _heightPx, 96, 96, PixelFormats.Pbgra32);
+        grid.Measure(new Size(_widthField, _heightField));
+        grid.Arrange(new Rect(new Size(_widthField, _heightField)));
+        var rtb = new RenderTargetBitmap(_widthField, _heightField, 96, 96, PixelFormats.Pbgra32);
         rtb.Render(grid);
         var encoder = new PngBitmapEncoder();
         encoder.Frames.Add(BitmapFrame.Create(rtb));
