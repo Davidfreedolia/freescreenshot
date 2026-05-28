@@ -72,6 +72,9 @@ public partial class SettingsWindow : Window
         SoundTitle.Text = Strings.T("settings.capture.sound.title");
         SoundDesc.Text  = Strings.T("settings.capture.sound.desc");
         SoundToggle.IsChecked = _config.PlaySound;
+        PreviewTitle.Text = Strings.T("settings.capture.preview.title");
+        PreviewDesc.Text  = Strings.T("settings.capture.preview.desc");
+        PreviewToggle.IsChecked = _config.ShowPreview;
 
         // Privacy
         PrivH.Text = Strings.T("settings.privacy.heading");
@@ -184,6 +187,13 @@ public partial class SettingsWindow : Window
     {
         if (_loading) return;
         _config.PlaySound = SoundToggle.IsChecked == true;
+        _config.Save();
+    }
+
+    private void OnPreviewChanged(object sender, RoutedEventArgs e)
+    {
+        if (_loading) return;
+        _config.ShowPreview = PreviewToggle.IsChecked == true;
         _config.Save();
     }
 

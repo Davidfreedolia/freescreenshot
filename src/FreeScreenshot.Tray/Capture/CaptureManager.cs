@@ -201,6 +201,20 @@ internal sealed class CaptureManager : IDisposable
             Strings.T("capture.toast.saved.title"),
             string.Format(Strings.T("capture.toast.saved.body"), $"{w}×{h}", Path.GetFileName(path)),
             path);
+
+        // CleanShot-style preview shelf in the bottom-right.
+        if (_config.ShowPreview)
+        {
+            Application.Current.Dispatcher.BeginInvoke(new Action(() =>
+            {
+                try
+                {
+                    var pw = new CapturePreviewWindow(path, png);
+                    pw.Show();
+                }
+                catch { /* preview is decorative — never block the flow */ }
+            }));
+        }
         return path;
     }
 

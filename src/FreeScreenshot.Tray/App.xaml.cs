@@ -22,6 +22,30 @@ public partial class App : Application
     public AppConfig Config { get; private set; } = new();
     public TelemetryClient? Telemetry { get; private set; }
 
+    static App()
+    {
+        // Defensive fix: if WINDIR/SystemRoot is missing from the process env
+        // (some launchers strip env vars), WPF's FontCache.Util cctor throws
+        // UriFormatException and the whole app fails to start. Restore them
+        // from the machine-level env vars before any WPF type is touched.
+        EnsureEnv("WINDIR", @"C:\WINDOWS");
+        EnsureEnv("SystemRoot", @"C:\WINDOWS");
+        EnsureEnv("windir", @"C:\WINDOWS");
+    }
+
+    private static void EnsureEnv(string name, string fallback)
+    {
+        try
+        {
+            var cur = System.Environment.GetEnvironmentVariable(name);
+            if (!string.IsNullOrEmpty(cur)) return;
+            var machine = System.Environment.GetEnvironmentVariable(name, EnvironmentVariableTarget.Machine);
+            var value = !string.IsNullOrEmpty(machine) ? machine : fallback;
+            System.Environment.SetEnvironmentVariable(name, value);
+        }
+        catch { /* never block startup over env fix-up */ }
+    }
+
     public static string AppVersion
     {
         get

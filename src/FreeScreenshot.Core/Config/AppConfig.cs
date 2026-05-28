@@ -55,6 +55,10 @@ public sealed class AppConfig
     [JsonPropertyName("capture_format")]
     public string CaptureFormat { get; set; } = "png";
 
+    /// <summary>Show a thumbnail preview in the bottom-right after each save.</summary>
+    [JsonPropertyName("show_preview")]
+    public bool ShowPreview { get; set; } = true;
+
     public static string ConfigDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FreeScreenshot");
 
