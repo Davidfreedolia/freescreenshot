@@ -15,7 +15,7 @@
         KeyDown="OnKeyDown">
   <Border Background="#F2112528"
           BorderBrush="#FF1F3A3D" BorderThickness="1"
-          CornerRadius="999" Padding="6"
+          CornerRadius="26" Padding="8,7"
           Effect="{x:Null}">
     <StackPanel Orientation="Horizontal" x:Name="ButtonsHost"/>
   </Border>

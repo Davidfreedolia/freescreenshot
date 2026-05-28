@@ -86,7 +86,7 @@ public partial class FloatingToolbar : Window
     {
         var d = new Rectangle
         {
-            Width = 1, Margin = new Thickness(6, 4, 6, 4),
+            Width = 1, Margin = new Thickness(8, 7, 8, 7),
             Fill = new SolidColorBrush(Color.FromRgb(0x1F, 0x3A, 0x3D)),
         };
         ButtonsHost.Children.Add(d);
@@ -96,8 +96,8 @@ public partial class FloatingToolbar : Window
     {
         var btn = new Button
         {
-            Width = 36, Height = 36,
-            Margin = new Thickness(2, 0, 2, 0),
+            Width = 38, Height = 38,
+            Margin = new Thickness(3, 0, 3, 0),
             BorderThickness = new Thickness(0),
             Background = primary
                 ? new SolidColorBrush(Color.FromRgb(0x2D, 0xD4, 0xBF))     // teal accent
@@ -118,7 +118,7 @@ public partial class FloatingToolbar : Window
     {
         var tmpl = new ControlTemplate(typeof(Button));
         var border = new FrameworkElementFactory(typeof(Border));
-        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(999));
+        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(19));
         border.SetBinding(Border.BackgroundProperty, new System.Windows.Data.Binding("Background") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
         var content = new FrameworkElementFactory(typeof(ContentPresenter));
         content.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
