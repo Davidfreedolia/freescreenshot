@@ -249,13 +249,16 @@
     </Setter>
   </Style>
 
-  <!-- Primary CTA: teal pill with dark text on accent -->
+  <!-- Primary CTA: teal pill with dark text on accent.
+       Use a finite CornerRadius (not 999) — WPF interprets very large
+       radii as "ellipse" and the button collapses to a flat oval. -->
   <Style x:Key="FsPrimaryButton" TargetType="Button">
     <Setter Property="Background" Value="{StaticResource Brush.Accent.Base}"/>
     <Setter Property="Foreground" Value="{StaticResource Brush.Accent.OnBase}"/>
     <Setter Property="BorderBrush" Value="{x:Null}"/>
     <Setter Property="BorderThickness" Value="0"/>
-    <Setter Property="Padding" Value="22,11"/>
+    <Setter Property="Padding" Value="20,9"/>
+    <Setter Property="MinHeight" Value="36"/>
     <Setter Property="FontSize" Value="13.5"/>
     <Setter Property="FontWeight" Value="SemiBold"/>
     <Setter Property="Cursor" Value="Hand"/>
@@ -265,8 +268,9 @@
         <ControlTemplate TargetType="Button">
           <Border x:Name="Bd"
                   Background="{TemplateBinding Background}"
-                  CornerRadius="999"
+                  CornerRadius="18"
                   Padding="{TemplateBinding Padding}"
+                  MinHeight="{TemplateBinding MinHeight}"
                   SnapsToDevicePixels="True">
             <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
                               TextElement.Foreground="{TemplateBinding Foreground}"

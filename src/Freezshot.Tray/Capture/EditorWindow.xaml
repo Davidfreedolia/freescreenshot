@@ -142,18 +142,18 @@
     <Border Grid.Row="2" Background="{DynamicResource Brush.Bg.Surface1}"
             BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="0,1,0,0">
       <DockPanel LastChildFill="False" Margin="16,0">
-        <Button x:Name="CancelBtn" DockPanel.Dock="Left" Padding="14,8"
+        <Button x:Name="CancelBtn" DockPanel.Dock="Left" Padding="12,6"
                 Background="Transparent" Foreground="{DynamicResource Brush.Text.Secondary}"
-                BorderThickness="0" Cursor="Hand" Click="OnCancel"/>
-        <Button x:Name="SaveBtn" DockPanel.Dock="Right" Padding="16,8" MinWidth="100"
-                Background="{DynamicResource Brush.Accent.Base}"
-                Foreground="#FF1A1814" BorderThickness="0"
-                FontWeight="SemiBold" Cursor="Hand"
+                BorderThickness="0" Cursor="Hand" FontSize="13" Click="OnCancel"
+                FocusVisualStyle="{x:Null}"/>
+        <Button x:Name="SaveBtn" DockPanel.Dock="Right" MinWidth="92"
+                Style="{DynamicResource FsPrimaryButton}"
                 Click="OnSave"/>
-        <Button x:Name="CopyBtn" DockPanel.Dock="Right" Padding="14,8" Margin="0,0,8,0" MinWidth="100"
+        <Button x:Name="CopyBtn" DockPanel.Dock="Right" Padding="14,7" Margin="0,0,8,0" MinWidth="92"
                 Background="{DynamicResource Brush.Bg.Surface2}"
                 Foreground="{DynamicResource Brush.Text.Primary}"
                 BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"
+                FocusVisualStyle="{x:Null}"
                 Click="OnCopy"/>
       </DockPanel>
     </Border>
