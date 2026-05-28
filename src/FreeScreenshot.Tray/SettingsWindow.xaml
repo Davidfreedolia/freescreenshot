@@ -205,10 +205,8 @@
             <TextBlock x:Name="DonateAboutTitle" FontWeight="SemiBold"/>
             <TextBlock x:Name="DonateAboutSub" Foreground="{DynamicResource Brush.Text.Secondary}"
                        Margin="0,4,0,12" TextWrapping="Wrap"/>
-            <Button x:Name="DonateBtn" Padding="14,8" HorizontalAlignment="Left"
-                    Background="{DynamicResource Brush.Accent.Base}"
-                    Foreground="#FF1A1814" BorderThickness="0"
-                    FontWeight="SemiBold" Cursor="Hand"
+            <Button x:Name="DonateBtn" HorizontalAlignment="Left"
+                    Style="{DynamicResource FsPrimaryButton}"
                     Click="OnDonate"/>
           </StackPanel>
         </Border>
@@ -236,7 +234,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
               </Trigger>
               <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="#1FA3E635"/>
+                <Setter TargetName="bd" Property="Background" Value="#1F2DD4BF"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Base}"/>
               </Trigger>
             </ControlTemplate.Triggers>

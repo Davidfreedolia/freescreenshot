@@ -29,27 +29,28 @@
 
   <Grid>
     <Border x:Name="Frame"
-            CornerRadius="10" Background="#FF25221E"
-            BorderBrush="#FF524C44" BorderThickness="1"
+            CornerRadius="14" Background="#FF112528"
+            BorderBrush="#FF1F3A3D" BorderThickness="1"
             Padding="6">
       <Border.Effect>
         <DropShadowEffect Color="#FF000000" Opacity="0.55" BlurRadius="22" ShadowDepth="0"/>
       </Border.Effect>
       <StackPanel>
-        <Border CornerRadius="6" ClipToBounds="True">
+        <Border CornerRadius="10" ClipToBounds="True">
           <Image x:Name="ShotImage" Stretch="None" Cursor="Hand"/>
         </Border>
-        <TextBlock x:Name="Caption" Margin="2,6,2,2" FontSize="11"
-                   Foreground="#FFA8A39B" TextTrimming="CharacterEllipsis"/>
+        <TextBlock x:Name="Caption" Margin="4,6,4,2" FontSize="11"
+                   Foreground="#FFA8BDB8" TextTrimming="CharacterEllipsis"/>
       </StackPanel>
     </Border>
     <Button x:Name="CloseBtn"
             Width="22" Height="22" Margin="0,-8,-8,0"
             HorizontalAlignment="Right" VerticalAlignment="Top"
-            Background="#FF25221E" Foreground="#FFF5F2EC"
-            BorderBrush="#FF524C44" BorderThickness="1"
+            Background="#FF193033" Foreground="#FFF0FAF7"
+            BorderBrush="#FF345456" BorderThickness="1"
             FontSize="13" FontWeight="Bold" Padding="0"
             Cursor="Hand"
+            FocusVisualStyle="{x:Null}"
             Content="×"
             Click="OnCloseClick"/>
   </Grid>

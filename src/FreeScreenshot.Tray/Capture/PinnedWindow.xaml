@@ -15,13 +15,14 @@
         MouseLeftButtonDown="OnDragStart"
         KeyDown="OnKeyDown">
   <Grid>
-    <Border BorderBrush="#FFA3E635" BorderThickness="2" CornerRadius="6">
+    <Border BorderBrush="#FF2DD4BF" BorderThickness="2" CornerRadius="10">
       <Image x:Name="ShotImage" Stretch="None"/>
     </Border>
     <Button x:Name="CloseBtn" Width="20" Height="20" Margin="0,6,6,0"
             HorizontalAlignment="Right" VerticalAlignment="Top"
-            Background="#E625221E" Foreground="#FFF5F2EC"
+            Background="#E6112528" Foreground="#FFF0FAF7"
             BorderThickness="0" Cursor="Hand"
+            FocusVisualStyle="{x:Null}"
             Content="×" FontSize="14" Padding="0"
             Click="OnClose"/>
   </Grid>

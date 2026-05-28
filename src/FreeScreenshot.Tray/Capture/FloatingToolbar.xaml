@@ -13,9 +13,9 @@
         UseLayoutRounding="True"
         SnapsToDevicePixels="True"
         KeyDown="OnKeyDown">
-  <Border Background="#F225221E"
-          BorderBrush="#FF524C44" BorderThickness="1"
-          CornerRadius="22" Padding="6"
+  <Border Background="#F2112528"
+          BorderBrush="#FF1F3A3D" BorderThickness="1"
+          CornerRadius="999" Padding="6"
           Effect="{x:Null}">
     <StackPanel Orientation="Horizontal" x:Name="ButtonsHost"/>
   </Border>

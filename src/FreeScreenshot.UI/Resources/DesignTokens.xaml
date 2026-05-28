@@ -4,29 +4,30 @@
 
   <!-- =========================================
        Freedolia Design Tokens — Dark Mode
-       Mirror of DESIGN-SYSTEM.md
+       Accent: Freedolia teal (mirror freedolia.com)
        ========================================= -->
 
-  <!-- Backgrounds -->
-  <Color x:Key="Color.Bg.Base">#FF1A1814</Color>
-  <Color x:Key="Color.Bg.Surface1">#FF25221E</Color>
-  <Color x:Key="Color.Bg.Surface2">#FF2F2C27</Color>
-  <Color x:Key="Color.Bg.Surface3">#FF3A3631</Color>
+  <!-- Backgrounds: deep teal-tinted dark, mirror of freedolia.com -->
+  <Color x:Key="Color.Bg.Base">#FF0A1A1C</Color>
+  <Color x:Key="Color.Bg.Surface1">#FF112528</Color>
+  <Color x:Key="Color.Bg.Surface2">#FF193033</Color>
+  <Color x:Key="Color.Bg.Surface3">#FF223D40</Color>
 
   <!-- Borders -->
-  <Color x:Key="Color.Border.Subtle">#FF3A3631</Color>
-  <Color x:Key="Color.Border.Strong">#FF524C44</Color>
+  <Color x:Key="Color.Border.Subtle">#FF1F3A3D</Color>
+  <Color x:Key="Color.Border.Strong">#FF345456</Color>
 
   <!-- Text -->
-  <Color x:Key="Color.Text.Primary">#FFF5F2EC</Color>
-  <Color x:Key="Color.Text.Secondary">#FFA8A39B</Color>
-  <Color x:Key="Color.Text.Muted">#FF6B6760</Color>
-  <Color x:Key="Color.Text.Disabled">#FF4A4640</Color>
+  <Color x:Key="Color.Text.Primary">#FFF0FAF7</Color>
+  <Color x:Key="Color.Text.Secondary">#FFA8BDB8</Color>
+  <Color x:Key="Color.Text.Muted">#FF6A7B78</Color>
+  <Color x:Key="Color.Text.Disabled">#FF44514F</Color>
 
-  <!-- Accent: lime -->
-  <Color x:Key="Color.Accent.Base">#FFA3E635</Color>
-  <Color x:Key="Color.Accent.Hover">#FFBEF264</Color>
-  <Color x:Key="Color.Accent.Pressed">#FF84CC16</Color>
+  <!-- Accent: Freedolia teal -->
+  <Color x:Key="Color.Accent.Base">#FF2DD4BF</Color>
+  <Color x:Key="Color.Accent.Hover">#FF5EEAD4</Color>
+  <Color x:Key="Color.Accent.Pressed">#FF14B8A6</Color>
+  <Color x:Key="Color.Accent.OnBase">#FF06302C</Color>
 
   <!-- Feedback -->
   <Color x:Key="Color.Feedback.Warning">#FFFBBF24</Color>
@@ -44,11 +45,14 @@
   <SolidColorBrush x:Key="Brush.Text.Muted" Color="{StaticResource Color.Text.Muted}" />
   <SolidColorBrush x:Key="Brush.Accent.Base" Color="{StaticResource Color.Accent.Base}" />
   <SolidColorBrush x:Key="Brush.Accent.Hover" Color="{StaticResource Color.Accent.Hover}" />
+  <SolidColorBrush x:Key="Brush.Accent.Pressed" Color="{StaticResource Color.Accent.Pressed}" />
+  <SolidColorBrush x:Key="Brush.Accent.OnBase" Color="{StaticResource Color.Accent.OnBase}" />
 
-  <!-- Sizes -->
-  <CornerRadius x:Key="Radius.Sm">6</CornerRadius>
-  <CornerRadius x:Key="Radius.Md">10</CornerRadius>
-  <CornerRadius x:Key="Radius.Lg">14</CornerRadius>
+  <!-- Sizes — Freedolia uses generous rounding -->
+  <CornerRadius x:Key="Radius.Sm">8</CornerRadius>
+  <CornerRadius x:Key="Radius.Md">12</CornerRadius>
+  <CornerRadius x:Key="Radius.Lg">18</CornerRadius>
+  <CornerRadius x:Key="Radius.Pill">999</CornerRadius>
 
   <Thickness x:Key="Pad.Sm">8</Thickness>
   <Thickness x:Key="Pad.Md">12</Thickness>
@@ -186,6 +190,114 @@
 
   <Style TargetType="ScrollBar">
     <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface1}"/>
+  </Style>
+
+  <!-- ===== Freedolia button styles ===== -->
+
+  <!-- Custom focus visual: subtle teal ring, not the dotted Windows default -->
+  <Style x:Key="FsFocusVisual">
+    <Setter Property="Control.Template">
+      <Setter.Value>
+        <ControlTemplate>
+          <Border CornerRadius="999" Margin="-3"
+                  BorderBrush="{StaticResource Brush.Accent.Base}" BorderThickness="2"
+                  Opacity="0.55"/>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Default Button: surface3 chip, generous rounding -->
+  <Style TargetType="Button">
+    <Setter Property="Background" Value="{StaticResource Brush.Bg.Surface3}"/>
+    <Setter Property="Foreground" Value="{StaticResource Brush.Text.Primary}"/>
+    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border.Subtle}"/>
+    <Setter Property="BorderThickness" Value="1"/>
+    <Setter Property="Padding" Value="14,8"/>
+    <Setter Property="FontSize" Value="13"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="SnapsToDevicePixels" Value="True"/>
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FsFocusVisual}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Bd"
+                  Background="{TemplateBinding Background}"
+                  BorderBrush="{TemplateBinding BorderBrush}"
+                  BorderThickness="{TemplateBinding BorderThickness}"
+                  CornerRadius="10"
+                  Padding="{TemplateBinding Padding}"
+                  SnapsToDevicePixels="True">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              TextElement.Foreground="{TemplateBinding Foreground}"
+                              TextBlock.Foreground="{TemplateBinding Foreground}"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource Brush.Border.Strong}"/>
+              <Setter TargetName="Bd" Property="Background" Value="#FF2A4549"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="{StaticResource Brush.Bg.Surface2}"/>
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="False">
+              <Setter Property="Foreground" Value="{StaticResource Brush.Text.Muted}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Primary CTA: teal pill with dark text on accent -->
+  <Style x:Key="FsPrimaryButton" TargetType="Button">
+    <Setter Property="Background" Value="{StaticResource Brush.Accent.Base}"/>
+    <Setter Property="Foreground" Value="{StaticResource Brush.Accent.OnBase}"/>
+    <Setter Property="BorderBrush" Value="{x:Null}"/>
+    <Setter Property="BorderThickness" Value="0"/>
+    <Setter Property="Padding" Value="22,11"/>
+    <Setter Property="FontSize" Value="13.5"/>
+    <Setter Property="FontWeight" Value="SemiBold"/>
+    <Setter Property="Cursor" Value="Hand"/>
+    <Setter Property="FocusVisualStyle" Value="{StaticResource FsFocusVisual}"/>
+    <Setter Property="Template">
+      <Setter.Value>
+        <ControlTemplate TargetType="Button">
+          <Border x:Name="Bd"
+                  Background="{TemplateBinding Background}"
+                  CornerRadius="999"
+                  Padding="{TemplateBinding Padding}"
+                  SnapsToDevicePixels="True">
+            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"
+                              TextElement.Foreground="{TemplateBinding Foreground}"
+                              TextBlock.Foreground="{TemplateBinding Foreground}"/>
+          </Border>
+          <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="{StaticResource Brush.Accent.Hover}"/>
+            </Trigger>
+            <Trigger Property="IsPressed" Value="True">
+              <Setter TargetName="Bd" Property="Background" Value="{StaticResource Brush.Accent.Pressed}"/>
+            </Trigger>
+          </ControlTemplate.Triggers>
+        </ControlTemplate>
+      </Setter.Value>
+    </Setter>
+  </Style>
+
+  <!-- Ghost / link-style button -->
+  <Style x:Key="FsGhostButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+    <Setter Property="Background" Value="Transparent"/>
+    <Setter Property="BorderBrush" Value="{StaticResource Brush.Border.Subtle}"/>
+  </Style>
+
+  <!-- Pill chip for status / "Gratis" labels -->
+  <Style x:Key="FsPillChip" TargetType="Border">
+    <Setter Property="Background" Value="#FF143630"/>
+    <Setter Property="CornerRadius" Value="999"/>
+    <Setter Property="Padding" Value="12,4"/>
+    <Setter Property="BorderBrush" Value="#FF1F5A4F"/>
+    <Setter Property="BorderThickness" Value="1"/>
   </Style>
 
 </ResourceDictionary>

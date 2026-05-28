@@ -103,7 +103,8 @@ internal sealed class TrayHost : IDisposable
                 var label = Path.GetFileName(path);
                 var item = new ToolStripMenuItem(label);
                 var captured = path; // closure
-                item.Click += (_, _) => TryOpen(captured);
+                // Open in OUR editor — never hand off to Paint / the OS viewer.
+                item.Click += (_, _) => Capture.EditorWindow.OpenForFile(captured);
                 if (!File.Exists(path)) item.Enabled = false;
                 historyMenu.DropDownItems.Add(item);
             }

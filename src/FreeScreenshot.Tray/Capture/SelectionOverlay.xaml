@@ -23,19 +23,20 @@
     <Rectangle x:Name="DimRight"  Fill="#8C141210"/>
 
     <Rectangle x:Name="SelBorder"
-               Stroke="#FFA3E635" StrokeThickness="1"
+               Stroke="#FF2DD4BF" StrokeThickness="1.5"
                Visibility="Collapsed"/>
 
-    <Border x:Name="SizeChip" Background="#FF25221E"
-            BorderBrush="#FF524C44" BorderThickness="1"
-            CornerRadius="4" Padding="6,3"
+    <Border x:Name="SizeChip" Background="#E6112528"
+            BorderBrush="#FF1F3A3D" BorderThickness="1"
+            CornerRadius="8" Padding="8,4"
             Visibility="Collapsed">
-      <TextBlock x:Name="SizeText" Foreground="#FFF5F2EC"
+      <TextBlock x:Name="SizeText" Foreground="#FF2DD4BF"
                  FontFamily="Cascadia Mono, Consolas, monospace"
+                 FontWeight="SemiBold"
                  FontSize="11"/>
     </Border>
 
-    <TextBlock x:Name="HintText" Foreground="#FFF5F2EC" FontSize="14" FontWeight="SemiBold">
+    <TextBlock x:Name="HintText" Foreground="#FFF0FAF7" FontSize="14" FontWeight="SemiBold">
       <TextBlock.Effect>
         <DropShadowEffect Color="#FF000000" Opacity="0.85" BlurRadius="8" ShadowDepth="0"/>
       </TextBlock.Effect>

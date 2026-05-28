@@ -1,0 +1,121 @@
+<!--
+  FreeScreenshot — banner for freedolia.com homepage
+  Mirror the existing FreeWisp banner. Drop this block (and its CSS) into the
+  homepage where the FreeWisp banner sits, OR render it as a separate row.
+  The icon is inline SVG so no extra asset is required.
+-->
+<a href="/es/freescreenshot" class="fs-banner" aria-label="FreeScreenshot — captura, anota i comparteix">
+  <div class="fs-banner__icon" aria-hidden="true">
+    <svg viewBox="0 0 256 256" width="64" height="64">
+      <defs>
+        <linearGradient id="fsBg" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#193033"/>
+          <stop offset="1" stop-color="#0A1A1C"/>
+        </linearGradient>
+        <linearGradient id="fsAcc" x1="0" y1="0" x2="1" y2="1">
+          <stop offset="0" stop-color="#5EEAD4"/>
+          <stop offset="1" stop-color="#2DD4BF"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="256" height="256" rx="56" ry="56" fill="url(#fsBg)"/>
+      <g fill="none" stroke="url(#fsAcc)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M 72 96 L 72 72 L 96 72"/>
+        <path d="M 184 160 L 184 184 L 160 184"/>
+      </g>
+      <circle cx="128" cy="128" r="10" fill="#5EEAD4"/>
+    </svg>
+  </div>
+
+  <div class="fs-banner__body">
+    <span class="fs-banner__pill">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 3l1.9 4.2L18 9l-4.1 1.8L12 15l-1.9-4.2L6 9l4.1-1.8z"/>
+      </svg>
+      GRATIS · REGALO DE FREEDOLIA
+    </span>
+    <h3 class="fs-banner__title">FreeScreenshot — captura, anota y comparte en un clic</h3>
+    <p class="fs-banner__sub">Capturas de pantalla para Windows. 100% local, sin cuenta, sin límites.</p>
+    <span class="fs-banner__news">
+      <span class="fs-banner__news-tag">Novedad v1.10</span>
+      Editor con flechas, blur y OCR · vista previa flotante post-captura.
+    </span>
+  </div>
+
+  <span class="fs-banner__cta">
+    Descúbrelo gratis
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M5 12h14"/><path d="M13 5l7 7-7 7"/>
+    </svg>
+  </span>
+</a>
+
+<style>
+/* Scoped to the banner — copy alongside the existing FreeWisp banner CSS */
+.fs-banner {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 28px;
+  align-items: center;
+  padding: 28px 32px;
+  border-radius: 24px;
+  background: radial-gradient(120% 140% at 0% 0%, #112528 0%, #0A1A1C 60%, #061214 100%);
+  border: 1px solid #1F3A3D;
+  text-decoration: none;
+  color: #F0FAF7;
+  transition: transform .15s ease, border-color .15s ease;
+}
+.fs-banner:hover { transform: translateY(-2px); border-color: #2DD4BF; }
+.fs-banner__icon {
+  width: 76px; height: 76px;
+  display: grid; place-items: center;
+  border-radius: 18px;
+  background: #0A1A1C;
+}
+.fs-banner__icon svg { width: 64px; height: 64px; }
+.fs-banner__body { min-width: 0; }
+.fs-banner__pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 5px 12px;
+  border-radius: 999px;
+  background: #143630;
+  border: 1px solid #1F5A4F;
+  color: #5EEAD4;
+  font-size: 11px; font-weight: 600; letter-spacing: .08em;
+  text-transform: uppercase;
+}
+.fs-banner__title {
+  margin: 12px 0 6px;
+  font-size: 28px; font-weight: 700; line-height: 1.15;
+  color: #F0FAF7;
+}
+.fs-banner__sub {
+  margin: 0; font-size: 15px; color: #A8BDB8;
+}
+.fs-banner__news {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin-top: 10px;
+  font-size: 13px; color: #A8BDB8;
+}
+.fs-banner__news-tag {
+  background: #2DD4BF; color: #06302C;
+  font-weight: 700; font-size: 11px;
+  padding: 3px 8px; border-radius: 6px;
+  letter-spacing: .04em;
+}
+.fs-banner__cta {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 12px 22px;
+  border-radius: 999px;
+  background: #2DD4BF; color: #06302C;
+  font-weight: 700; font-size: 14px;
+  white-space: nowrap;
+  transition: background .15s ease;
+}
+.fs-banner:hover .fs-banner__cta { background: #5EEAD4; }
+
+@media (max-width: 720px) {
+  .fs-banner { grid-template-columns: 1fr; text-align: left; }
+  .fs-banner__cta { justify-self: start; }
+  .fs-banner__title { font-size: 22px; }
+}
+</style>

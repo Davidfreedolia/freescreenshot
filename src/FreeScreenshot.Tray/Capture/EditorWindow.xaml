@@ -79,7 +79,7 @@
 
           <!-- Color swatches -->
           <RadioButton x:Name="ColorLime"   GroupName="color" Style="{DynamicResource SwatchBtn}"
-                       IsChecked="True" Tag="#A3E635" ToolTip="Llima"/>
+                       IsChecked="True" Tag="#2DD4BF" ToolTip="Teal"/>
           <RadioButton x:Name="ColorRed"    GroupName="color" Style="{DynamicResource SwatchBtn}"
                        Tag="#EF4444" ToolTip="Vermell"/>
           <RadioButton x:Name="ColorYellow" GroupName="color" Style="{DynamicResource SwatchBtn}"
@@ -178,7 +178,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
               </Trigger>
               <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="#1FA3E635"/>
+                <Setter TargetName="bd" Property="Background" Value="#1F2DD4BF"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Base}"/>
               </Trigger>
             </ControlTemplate.Triggers>
@@ -255,7 +255,7 @@
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Text.Primary}"/>
               </Trigger>
               <Trigger Property="IsChecked" Value="True">
-                <Setter TargetName="bd" Property="Background" Value="#1FA3E635"/>
+                <Setter TargetName="bd" Property="Background" Value="#1F2DD4BF"/>
                 <Setter Property="Foreground" Value="{DynamicResource Brush.Accent.Base}"/>
               </Trigger>
             </ControlTemplate.Triggers>

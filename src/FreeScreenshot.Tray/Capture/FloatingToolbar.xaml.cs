@@ -87,7 +87,7 @@ public partial class FloatingToolbar : Window
         var d = new Rectangle
         {
             Width = 1, Margin = new Thickness(6, 4, 6, 4),
-            Fill = new SolidColorBrush(Color.FromRgb(0x52, 0x4C, 0x44)),
+            Fill = new SolidColorBrush(Color.FromRgb(0x1F, 0x3A, 0x3D)),
         };
         ButtonsHost.Children.Add(d);
     }
@@ -100,14 +100,15 @@ public partial class FloatingToolbar : Window
             Margin = new Thickness(2, 0, 2, 0),
             BorderThickness = new Thickness(0),
             Background = primary
-                ? new SolidColorBrush(Color.FromRgb(0xA3, 0xE6, 0x35))
+                ? new SolidColorBrush(Color.FromRgb(0x2D, 0xD4, 0xBF))     // teal accent
                 : System.Windows.Media.Brushes.Transparent,
             Foreground = primary
-                ? System.Windows.Media.Brushes.Black
-                : new SolidColorBrush(Color.FromRgb(0xF5, 0xF2, 0xEC)),
+                ? new SolidColorBrush(Color.FromRgb(0x06, 0x30, 0x2C))     // on-accent text
+                : new SolidColorBrush(Color.FromRgb(0xF0, 0xFA, 0xF7)),
             ToolTip = tooltip,
             Cursor = System.Windows.Input.Cursors.Hand,
             Content = icon,
+            FocusVisualStyle = null,
         };
         btn.Template = BuildButtonTemplate(primary);
         return btn;
@@ -117,7 +118,7 @@ public partial class FloatingToolbar : Window
     {
         var tmpl = new ControlTemplate(typeof(Button));
         var border = new FrameworkElementFactory(typeof(Border));
-        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(16));
+        border.SetValue(Border.CornerRadiusProperty, new CornerRadius(999));
         border.SetBinding(Border.BackgroundProperty, new System.Windows.Data.Binding("Background") { RelativeSource = System.Windows.Data.RelativeSource.TemplatedParent });
         var content = new FrameworkElementFactory(typeof(ContentPresenter));
         content.SetValue(ContentPresenter.HorizontalAlignmentProperty, HorizontalAlignment.Center);
@@ -125,10 +126,16 @@ public partial class FloatingToolbar : Window
         border.AppendChild(content);
         tmpl.VisualTree = border;
 
-        if (!primary)
+        if (primary)
         {
             var hover = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
-            hover.Setters.Add(new Setter(Button.BackgroundProperty, new SolidColorBrush(Color.FromRgb(0x3A, 0x36, 0x31))));
+            hover.Setters.Add(new Setter(Button.BackgroundProperty, new SolidColorBrush(Color.FromRgb(0x5E, 0xEA, 0xD4))));
+            tmpl.Triggers.Add(hover);
+        }
+        else
+        {
+            var hover = new Trigger { Property = UIElement.IsMouseOverProperty, Value = true };
+            hover.Setters.Add(new Setter(Button.BackgroundProperty, new SolidColorBrush(Color.FromRgb(0x22, 0x3D, 0x40))));
             tmpl.Triggers.Add(hover);
         }
         return tmpl;
@@ -170,7 +177,7 @@ public partial class FloatingToolbar : Window
     {
         var path = new System.Windows.Shapes.Path
         {
-            Stroke = new SolidColorBrush(Color.FromRgb(0xF5, 0xF2, 0xEC)),
+            Stroke = new SolidColorBrush(Color.FromRgb(0xF0, 0xFA, 0xF7)),
             StrokeThickness = 1.6,
             StrokeStartLineCap = PenLineCap.Round,
             StrokeEndLineCap = PenLineCap.Round,

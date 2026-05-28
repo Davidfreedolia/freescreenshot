@@ -21,20 +21,20 @@
       <RowDefinition Height="Auto"/>
     </Grid.RowDefinitions>
 
-    <!-- Big lime logo tile -->
-    <Border Grid.Row="0" Width="56" Height="56" HorizontalAlignment="Left" CornerRadius="12">
+    <!-- Logo tile — Freedolia teal -->
+    <Border Grid.Row="0" Width="56" Height="56" HorizontalAlignment="Left" CornerRadius="14">
       <Border.Background>
         <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
-          <GradientStop Color="#FFBEF264" Offset="0"/>
-          <GradientStop Color="#FF84CC16" Offset="1"/>
+          <GradientStop Color="#FF193033" Offset="0"/>
+          <GradientStop Color="#FF0A1A1C" Offset="1"/>
         </LinearGradientBrush>
       </Border.Background>
       <Canvas>
-        <Path Stroke="#FF1A1814" StrokeThickness="3" StrokeStartLineCap="Square" StrokeEndLineCap="Square"
+        <Path Stroke="#FF2DD4BF" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
               Data="M 14 22 L 14 12 L 24 12"/>
-        <Path Stroke="#FF1A1814" StrokeThickness="3" StrokeStartLineCap="Square" StrokeEndLineCap="Square"
+        <Path Stroke="#FF2DD4BF" StrokeThickness="3" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
               Data="M 42 34 L 42 44 L 32 44"/>
-        <Ellipse Width="6" Height="6" Canvas.Left="25" Canvas.Top="25" Fill="#FF1A1814"/>
+        <Ellipse Width="6" Height="6" Canvas.Left="25" Canvas.Top="25" Fill="#FF2DD4BF"/>
       </Canvas>
     </Border>
 
@@ -59,7 +59,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" VerticalAlignment="Top">
               <Ellipse Width="36" Height="36" Fill="{DynamicResource Brush.Accent.Base}"/>
-              <TextBlock Text="1" FontWeight="Bold" FontSize="16" Foreground="#FF1A1814"
+              <TextBlock Text="1" FontWeight="Bold" FontSize="16" Foreground="#FF06302C"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <StackPanel Grid.Column="1" Margin="12,0,12,0">
@@ -94,7 +94,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" VerticalAlignment="Top">
               <Ellipse Width="36" Height="36" Fill="{DynamicResource Brush.Accent.Base}"/>
-              <TextBlock Text="2" FontWeight="Bold" FontSize="16" Foreground="#FF1A1814"
+              <TextBlock Text="2" FontWeight="Bold" FontSize="16" Foreground="#FF06302C"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <StackPanel Grid.Column="1" Margin="12,0,12,0">
@@ -106,7 +106,7 @@
             <Canvas Grid.Column="2" Width="80" Height="64" VerticalAlignment="Center">
               <Rectangle Width="64" Height="44" Canvas.Left="8" Canvas.Top="10"
                          Stroke="{DynamicResource Brush.Accent.Base}" StrokeThickness="1.6"
-                         StrokeDashArray="3 3" Fill="#1FA3E635"/>
+                         StrokeDashArray="3 3" Fill="#1F2DD4BF"/>
               <!-- Crosshair / pointer near bottom-right corner -->
               <Path Canvas.Left="50" Canvas.Top="36" Stroke="{DynamicResource Brush.Text.Primary}"
                     StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
@@ -127,7 +127,7 @@
             </Grid.ColumnDefinitions>
             <Grid Grid.Column="0" VerticalAlignment="Top">
               <Ellipse Width="36" Height="36" Fill="{DynamicResource Brush.Accent.Base}"/>
-              <TextBlock Text="3" FontWeight="Bold" FontSize="16" Foreground="#FF1A1814"
+              <TextBlock Text="3" FontWeight="Bold" FontSize="16" Foreground="#FF06302C"
                          HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Grid>
             <StackPanel Grid.Column="1" Margin="12,0,12,0">
@@ -138,7 +138,7 @@
             <!-- Illustration: folder with a tiny picture inside -->
             <Canvas Grid.Column="2" Width="80" Height="64" VerticalAlignment="Center">
               <Path Stroke="{DynamicResource Brush.Accent.Base}" StrokeThickness="1.8"
-                    StrokeLineJoin="Round" Fill="#1FA3E635"
+                    StrokeLineJoin="Round" Fill="#1F2DD4BF"
                     Data="M 8 18 L 28 18 L 34 24 L 72 24 L 72 56 L 8 56 Z"/>
               <Rectangle Width="22" Height="14" Canvas.Left="32" Canvas.Top="32"
                          Fill="{DynamicResource Brush.Text.Primary}" RadiusX="2" RadiusY="2"/>
@@ -155,15 +155,10 @@
     </ScrollViewer>
 
     <DockPanel Grid.Row="3" Margin="0,18,0,0" LastChildFill="False">
-      <Button x:Name="DoneBtn" DockPanel.Dock="Right" Padding="18,10" MinWidth="148"
-              Background="{DynamicResource Brush.Accent.Base}"
-              Foreground="#FF1A1814" BorderThickness="0"
-              FontWeight="SemiBold" Cursor="Hand"
+      <Button x:Name="DoneBtn" DockPanel.Dock="Right" MinWidth="148"
+              Style="{DynamicResource FsPrimaryButton}"
               Click="OnDone"/>
-      <Button x:Name="SettingsBtn" DockPanel.Dock="Right" Padding="14,10" Margin="0,0,8,0"
-              Background="{DynamicResource Brush.Bg.Surface2}"
-              Foreground="{DynamicResource Brush.Text.Primary}"
-              BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"
+      <Button x:Name="SettingsBtn" DockPanel.Dock="Right" Margin="0,0,8,0"
               Click="OnSettings"/>
     </DockPanel>
   </Grid>

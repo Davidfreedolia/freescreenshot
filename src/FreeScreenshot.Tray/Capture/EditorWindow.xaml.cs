@@ -35,6 +35,31 @@ public partial class EditorWindow : Window
     public byte[]? EditedPng { get; private set; }
     public bool ShouldSave { get; private set; }
 
+    /// <summary>
+    /// Open the editor for a capture already saved to disk. Reads the bytes,
+    /// then either focuses an existing editor for the same file or pops a new
+    /// one. This is what the preview shelf and the tray history call so we
+    /// never hand the file off to Paint / the OS image viewer.
+    /// </summary>
+    public static void OpenForFile(string path)
+    {
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path)) return;
+        try
+        {
+            var bytes = File.ReadAllBytes(path);
+            var existing = System.Windows.Application.Current.Windows.OfType<EditorWindow>()
+                .FirstOrDefault(w => string.Equals(w._sourcePath, path, StringComparison.OrdinalIgnoreCase));
+            if (existing is not null) { existing.Activate(); return; }
+            var ed = new EditorWindow(bytes) { _sourcePath = path };
+            ed.Title = $"FreeScreenshot — {Path.GetFileName(path)}";
+            ed.Show();
+            ed.Activate();
+        }
+        catch { /* never block UX on a corrupt file */ }
+    }
+
+    private string? _sourcePath;
+
     public EditorWindow(byte[] pngBytes)
     {
         InitializeComponent();
@@ -78,8 +103,8 @@ public partial class EditorWindow : Window
                 ColorRed.IsChecked    == true ? "#EF4444" :
                 ColorYellow.IsChecked == true ? "#FBBF24" :
                 ColorWhite.IsChecked  == true ? "#F5F2EC" :
-                ColorDark.IsChecked   == true ? "#1A1814" :
-                                                "#A3E635";
+                ColorDark.IsChecked   == true ? "#0A1A1C" :
+                                                "#2DD4BF";
             var c = (Color)ColorConverter.ConvertFromString(hex);
             var b = new SolidColorBrush(c);
             b.Freeze();

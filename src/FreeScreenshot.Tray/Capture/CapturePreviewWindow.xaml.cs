@@ -90,6 +90,7 @@ public partial class CapturePreviewWindow : Window
 
     private static void TryOpen(string path)
     {
-        try { Process.Start(new ProcessStartInfo(path) { UseShellExecute = true }); } catch { }
+        // Always open in our own editor — never hand off to Paint / the OS viewer.
+        EditorWindow.OpenForFile(path);
     }
 }

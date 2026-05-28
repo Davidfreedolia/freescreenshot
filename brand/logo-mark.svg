@@ -1,4 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 256 256" width="256" height="256" role="img" aria-label="FreeScreenshot">
+  <!-- Rounded dark tile, gradient base mirroring Freedolia tiles -->
   <defs>
     <linearGradient id="bg" x1="0" y1="0" x2="0" y2="1">
       <stop offset="0" stop-color="#193033"/>
@@ -10,9 +11,15 @@
     </linearGradient>
   </defs>
   <rect x="0" y="0" width="256" height="256" rx="56" ry="56" fill="url(#bg)"/>
+
+  <!-- Selection brackets (top-left + bottom-right) — the screenshot crop motif -->
   <g fill="none" stroke="url(#acc)" stroke-width="14" stroke-linecap="round" stroke-linejoin="round">
+    <!-- TL bracket -->
     <path d="M 72 96 L 72 72 L 96 72"/>
+    <!-- BR bracket -->
     <path d="M 184 160 L 184 184 L 160 184"/>
   </g>
+
+  <!-- Center dot -->
   <circle cx="128" cy="128" r="10" fill="#5EEAD4"/>
 </svg>
