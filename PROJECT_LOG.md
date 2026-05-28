@@ -183,6 +183,26 @@ the entire conversation history.
 - Bumped to v2.0.0.
 - AGENTS.md + PROJECT_LOG.md added.
 
+## v2.0.1 — Button polish
+
+- `FsPrimaryButton` was rendering as a flat ellipse because
+  `CornerRadius=999` over a sub-36px button is interpreted by WPF as a
+  full ellipse. Replaced with `CornerRadius=18`, `MinHeight=36`,
+  `Padding=20,9` so the pill shape is correct at any size.
+- Editor toolbar (`Save`, `Copy`, `Cancel`) was overweight. Now:
+  - `SaveBtn` uses the shared `FsPrimaryButton` style (consistent teal
+    pill, correct `OnBase` text colour, no hard-coded `#FF1A1814`).
+  - `CopyBtn` reduced to `Padding=14,7`, `MinWidth=92`.
+  - `CancelBtn` reduced to `Padding=12,6`, `FontSize=13`.
+  - All three set `FocusVisualStyle=null` to suppress the purple WPF
+    focus rectangle on click.
+
+## Process rule (effective v2.0.1+)
+
+Every commit from here on **must** update `AGENTS.md` and
+`PROJECT_LOG.md` before being pushed. See the "House rule" at the top
+of `AGENTS.md` for the checklist.
+
 ---
 
 ## Operational notes

@@ -5,6 +5,26 @@ ship Freezshot (the Freedolia screenshot tool for Windows). Format follows
 the agents.md convention so a future agent walking into this repo knows
 which capabilities the project leans on.
 
+## ⚠️ House rule for any agent working here
+
+**Every commit must keep `AGENTS.md` and `PROJECT_LOG.md` up to date.**
+
+Before staging a commit:
+
+1. If you used a new skill, agent, MCP, CLI tool or external service that
+   isn't already listed, **add it to the relevant section of this file**
+   (Agents / Skills / External MCPs / Build & release dependencies).
+2. Append the change to `PROJECT_LOG.md` under a new (or existing) version
+   heading. Cover: what shipped, why, anything an agent walking in cold
+   would need to know.
+3. If the change adds a new module (new `src/Freezshot.<Name>` project),
+   record it in `PROJECT_LOG.md` and update the "Structure" line below.
+4. Only then run `commit-fs-v19.cmd` and push.
+
+This rule exists so that no future session has to rediscover what we built
+or which tool we leaned on. The two docs are the project's institutional
+memory.
+
 ## Project at a glance
 
 - **Product:** Freezshot — Windows screenshot tool with editor, OCR, pin,
