@@ -51,6 +51,10 @@ public sealed class AppConfig
     [JsonPropertyName("play_sound")]
     public bool PlaySound { get; set; }
 
+    /// <summary>Output format for saved screenshots: "png" (default), "jpg" or "webp".</summary>
+    [JsonPropertyName("capture_format")]
+    public string CaptureFormat { get; set; } = "png";
+
     public static string ConfigDirectory =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "FreeScreenshot");
 

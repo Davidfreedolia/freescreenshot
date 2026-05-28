@@ -58,6 +58,12 @@ public partial class SettingsWindow : Window
         CaptureFolderText.Text = folderPath;
         CaptureFolderText.ToolTip = folderPath; // full path on hover for truncated cases
 
+        OutFormatLbl.Text = Strings.T("settings.output.format");
+        FmtPng.Content = Strings.T("settings.output.format.png");
+        FmtJpg.Content = Strings.T("settings.output.format.jpg");
+        var current = string.IsNullOrWhiteSpace(_config.CaptureFormat) ? "png" : _config.CaptureFormat.ToLowerInvariant();
+        OutFormatCombo.SelectedItem = current == "jpg" ? FmtJpg : FmtPng;
+
         // Capture options
         CapH.Text = Strings.T("settings.capture.heading");
         EditorTitle.Text = Strings.T("settings.capture.editor.title");
@@ -130,6 +136,15 @@ public partial class SettingsWindow : Window
     private void OnDonate(object sender, RoutedEventArgs e)
     {
         try { Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true }); } catch { }
+    }
+
+    private void OnFormatChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_loading) return;
+        var item = OutFormatCombo.SelectedItem as ComboBoxItem;
+        var fmt = (item?.Tag as string) ?? "png";
+        _config.CaptureFormat = fmt;
+        _config.Save();
     }
 
     private void OnReplayOnboarding(object sender, RoutedEventArgs e)

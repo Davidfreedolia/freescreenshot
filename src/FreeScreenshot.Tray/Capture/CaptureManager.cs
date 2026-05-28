@@ -196,7 +196,7 @@ internal sealed class CaptureManager : IDisposable
         var folder = !string.IsNullOrWhiteSpace(_config.CaptureFolder)
             ? _config.CaptureFolder!
             : GdiCaptureEngine.DefaultSaveFolder;
-        var path = GdiCaptureEngine.SaveToDisk(png, folder);
+        var path = GdiCaptureEngine.SaveToDisk(png, folder, _config.CaptureFormat);
         _toast(
             Strings.T("capture.toast.saved.title"),
             string.Format(Strings.T("capture.toast.saved.body"), $"{w}×{h}", Path.GetFileName(path)),

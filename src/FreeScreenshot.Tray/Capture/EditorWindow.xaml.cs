@@ -19,7 +19,9 @@ namespace FreeScreenshot.Capture;
 
 public partial class EditorWindow : Window
 {
-    private enum Tool { Arrow, Rectangle, Text, Blur, Crop }
+    private enum Tool { Arrow, Rectangle, Text, Blur, Crop, Line, Marker, Number }
+
+    private int _nextNumber = 1;
 
     private readonly byte[] _originalPng;
     private readonly int _widthPx;
@@ -59,10 +61,13 @@ public partial class EditorWindow : Window
     }
 
     private Tool CurrentTool =>
-        ToolRect.IsChecked == true ? Tool.Rectangle :
-        ToolText.IsChecked == true ? Tool.Text :
-        ToolBlur.IsChecked == true ? Tool.Blur :
-        ToolCrop.IsChecked == true ? Tool.Crop :
+        ToolRect.IsChecked   == true ? Tool.Rectangle :
+        ToolText.IsChecked   == true ? Tool.Text :
+        ToolBlur.IsChecked   == true ? Tool.Blur :
+        ToolCrop.IsChecked   == true ? Tool.Crop :
+        ToolLine.IsChecked   == true ? Tool.Line :
+        ToolMark.IsChecked   == true ? Tool.Marker :
+        ToolNumber.IsChecked == true ? Tool.Number :
         Tool.Arrow;
 
     private SolidColorBrush CurrentColor
@@ -136,6 +141,7 @@ public partial class EditorWindow : Window
         {
             OverlayCanvas.Children.Add(shape);
             _shapes.Push(shape);
+            if (CurrentTool == Tool.Number) _nextNumber++;
         }
     }
 
@@ -226,6 +232,63 @@ public partial class EditorWindow : Window
                 }
                 return g;
             }
+            case Tool.Line:
+            {
+                var line = new Line
+                {
+                    X1 = a.X, Y1 = a.Y, X2 = b.X, Y2 = b.Y,
+                    Stroke = brush, StrokeThickness = thickness,
+                    StrokeStartLineCap = PenLineCap.Round,
+                    StrokeEndLineCap   = PenLineCap.Round,
+                };
+                return line;
+            }
+            case Tool.Marker:
+            {
+                // Semi-transparent yellow rectangle, no stroke — acts as a highlighter.
+                var fill = new SolidColorBrush(Color.FromArgb(0x66, 0xFB, 0xBF, 0x24));
+                fill.Freeze();
+                var rect = new Rectangle
+                {
+                    Fill = fill,
+                    Width = Math.Abs(b.X - a.X),
+                    Height = Math.Abs(b.Y - a.Y),
+                };
+                System.Windows.Controls.Canvas.SetLeft(rect, Math.Min(a.X, b.X));
+                System.Windows.Controls.Canvas.SetTop(rect,  Math.Min(a.Y, b.Y));
+                return rect;
+            }
+            case Tool.Number:
+            {
+                // Numbers ignore drag — they always place a fixed-size badge at the start point.
+                var size = Math.Max(28, _widthPx * 0.025);
+                var dark = new SolidColorBrush(Color.FromRgb(0x1A, 0x18, 0x14)); dark.Freeze();
+                var container = new System.Windows.Controls.Canvas { Width = size, Height = size };
+                var bg = new System.Windows.Shapes.Ellipse
+                {
+                    Width = size, Height = size,
+                    Fill = brush,
+                    Stroke = dark,
+                    StrokeThickness = thickness * 0.3,
+                };
+                container.Children.Add(bg);
+                var label = new System.Windows.Controls.TextBlock
+                {
+                    Text = _nextNumber.ToString(),
+                    Foreground = dark,
+                    FontWeight = FontWeights.Bold,
+                    FontSize = size * 0.5,
+                    Width = size, Height = size,
+                    TextAlignment = TextAlignment.Center,
+                };
+                // Centre vertically by padding from top.
+                label.Padding = new Thickness(0, size * 0.18, 0, 0);
+                container.Children.Add(label);
+                System.Windows.Controls.Canvas.SetLeft(container, a.X - size / 2);
+                System.Windows.Controls.Canvas.SetTop(container,  a.Y - size / 2);
+                // Only increment once we commit the shape on mouse-up — preview reuses the current number.
+                return container;
+            }
             case Tool.Blur:
             {
                 var w = Math.Abs(b.X - a.X);
@@ -310,6 +373,8 @@ public partial class EditorWindow : Window
         if (_shapes.Count == 0) return;
         var last = _shapes.Pop();
         OverlayCanvas.Children.Remove(last);
+        // If we undid a number badge, roll back the counter so the next badge reuses it.
+        if (_nextNumber > 1) _nextNumber--;
     }
 
     private byte[] Render()
