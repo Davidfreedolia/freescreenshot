@@ -90,17 +90,19 @@ public partial class App : Application
             new SettingsWindow().Show();
 
         // First-launch onboarding so users never lose track of the tray icon.
+        // Mark it as done IMMEDIATELY when we decide to show it — closing
+        // the window with the X must not re-trigger it on next boot.
         if (!Config.OnboardingDone)
         {
-            var ob = new OnboardingWindow();
-            ob.Show();
+            Config.OnboardingDone = true;
             Config.ConsentedPrivacyVersion ??= "v1";
             Config.Save();
+            var ob = new OnboardingWindow();
+            ob.Show();
         }
         else
         {
-            // Subsequent launches: brief balloon so the tray is at least signposted.
-            _tray.ShowStartupBalloon();
+            // Subsequent launches: nothing. The user has already met the app.
         }
 
         _ = Task.Run(BackgroundStartupTasksAsync);

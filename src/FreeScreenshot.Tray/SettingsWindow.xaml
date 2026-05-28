@@ -166,6 +166,12 @@
                      FontFamily="{DynamicResource Font.Mono}"/>
         </Grid>
 
+        <Button x:Name="ReplayOnboardingBtn" Margin="0,20,0,0" HorizontalAlignment="Left"
+                Padding="12,8" Click="OnReplayOnboarding"
+                Background="{DynamicResource Brush.Bg.Surface2}"
+                Foreground="{DynamicResource Brush.Text.Primary}"
+                BorderBrush="{DynamicResource Brush.Border.Subtle}" Cursor="Hand"/>
+
         <Border Margin="0,24,0,0" Background="{DynamicResource Brush.Bg.Surface1}"
                 BorderBrush="{DynamicResource Brush.Border.Subtle}" BorderThickness="1"
                 CornerRadius="10" Padding="16">

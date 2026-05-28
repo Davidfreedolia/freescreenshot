@@ -87,6 +87,7 @@ public partial class SettingsWindow : Window
         DonateAboutTitle.Text = Strings.T("settings.about.donate");
         DonateAboutSub.Text = Strings.T("settings.about.sub");
         DonateBtn.Content = Strings.T("settings.about.donate.btn");
+        ReplayOnboardingBtn.Content = Strings.T("settings.about.replay_onboarding");
 
         _loading = false;
     }
@@ -129,6 +130,13 @@ public partial class SettingsWindow : Window
     private void OnDonate(object sender, RoutedEventArgs e)
     {
         try { Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true }); } catch { }
+    }
+
+    private void OnReplayOnboarding(object sender, RoutedEventArgs e)
+    {
+        var existing = Application.Current.Windows.OfType<OnboardingWindow>().FirstOrDefault();
+        if (existing is not null) { existing.Activate(); return; }
+        new OnboardingWindow().Show();
     }
 
     private void OnBrowseCaptureFolder(object sender, RoutedEventArgs e)
