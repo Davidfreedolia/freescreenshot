@@ -9,8 +9,13 @@ namespace Freezshot.Core.Localization;
 /// </summary>
 public static class Strings
 {
-    public const string DonationUrl = "https://freedolia.com/donate";
-    public const string SupportUrl  = "https://freedolia.com/Freezshot";
+    /// <summary>
+    /// Stripe payment link (same pattern as FreeWisp). Public hosted page; no
+    /// account or login required. Never hard-code the dashboard URL here —
+    /// that's the admin surface and would 404 for end users.
+    /// </summary>
+    public const string DonationUrl = "https://donate.stripe.com/6oUcN559jeWpcDZ8eMfYY04";
+    public const string SupportUrl  = "https://freedolia.com/freezshot";
 
     public static string Current { get; private set; } = "en";
 
@@ -95,6 +100,8 @@ public static class Strings
             ["onboarding.step3.title"] = "3. On es desa",
             ["onboarding.step3.body"] = "Per defecte a Imatges\\Freezshot. A Configuració > General pots canviar la carpeta, mirar el menú d'opcions o desactivar el tracking.",
             ["onboarding.done"] = "Provem-ho",
+            ["onboarding.donate.hint"] = "Et serveix? Ajuda'ns amb un donatiu.",
+            ["onboarding.donate.cta"]  = "❤  Fer un donatiu",
             ["history.menu_header"] = "Captures recents",
             ["history.empty"] = "(cap captura encara)",
             ["history.open_folder"] = "Obrir carpeta de captures",
@@ -198,6 +205,8 @@ public static class Strings
             ["onboarding.step3.title"] = "3. Dónde se guarda",
             ["onboarding.step3.body"] = "Por defecto en Imágenes\\Freezshot. En Configuración > General puedes cambiar la carpeta, abrir el menú de opciones o desactivar el tracking.",
             ["onboarding.done"] = "Probemos",
+            ["onboarding.donate.hint"] = "¿Te sirve? Ayúdanos con una donación.",
+            ["onboarding.donate.cta"]  = "❤  Hacer una donación",
             ["history.menu_header"] = "Capturas recientes",
             ["history.empty"] = "(ninguna captura aún)",
             ["history.open_folder"] = "Abrir carpeta de capturas",
@@ -301,6 +310,8 @@ public static class Strings
             ["onboarding.step3.title"] = "3. Where it's saved",
             ["onboarding.step3.body"] = "Default: Pictures\\Freezshot. In Settings > General you can change the folder, open the menu of options, or disable tracking.",
             ["onboarding.done"] = "Let's try it",
+            ["onboarding.donate.hint"] = "Useful? Support us with a donation.",
+            ["onboarding.donate.cta"]  = "❤  Donate",
             ["history.menu_header"] = "Recent screenshots",
             ["history.empty"] = "(no captures yet)",
             ["history.open_folder"] = "Open screenshots folder",

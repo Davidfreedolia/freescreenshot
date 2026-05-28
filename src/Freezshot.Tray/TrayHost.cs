@@ -126,7 +126,15 @@ internal sealed class TrayHost : IDisposable
         menu.Items.Add(Strings.T("menu.settings"), null, (_, _) => OpenSettings());
         menu.Items.Add(Strings.T("menu.about"),    null, (_, _) => OpenAbout());
         menu.Items.Add(new ToolStripSeparator());
-        menu.Items.Add(Strings.T("menu.donate"),   null, (_, _) => OpenDonation());
+
+        // Donation entry is intentionally prominent: bold, with a heart, and
+        // promoted out of the secondary submenu. Freezshot is free; donations
+        // are the only revenue lever.
+        var donate = new ToolStripMenuItem("❤  " + Strings.T("menu.donate"));
+        donate.Font = new System.Drawing.Font(menu.Font, System.Drawing.FontStyle.Bold);
+        donate.Click += (_, _) => OpenDonation();
+        menu.Items.Add(donate);
+
         menu.Items.Add(new ToolStripSeparator());
         menu.Items.Add(Strings.T("menu.quit"),     null, (_, _) => _app.Shutdown());
         return menu;

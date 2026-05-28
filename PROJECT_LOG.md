@@ -203,6 +203,39 @@ Every commit from here on **must** update `AGENTS.md` and
 `PROJECT_LOG.md` before being pushed. See the "House rule" at the top
 of `AGENTS.md` for the checklist.
 
+## v2.1 — Clean upgrade migration, visible donation, SmartScreen guidance
+
+- **Upgrade migration in Inno Setup `[Code]` section.** When you install
+  Freezshot it now scans `HKCU\…\Uninstall\*` and `HKLM\…\Uninstall\*`
+  by `DisplayName="FreeScreenshot"`, runs the old uninstaller if its
+  exe still exists, and deletes the orphan registry key + leftover
+  install folder `%LOCALAPPDATA%\Programs\FreeScreenshot` either way.
+  Verified: machine ends with a single "Freezshot 2.1.0" entry in
+  Add/Remove Programs even when the old install was corrupt or
+  partially removed.
+- **Why enumeration, not a fixed key.** The first attempt hard-coded
+  `{6E2B1D2A-…}_is1` as the path. Inno writes the actual key as
+  `{6E2B1D2A-…}}_is1` (extra `}`) so a literal-path match silently
+  failed. We now enumerate subkeys and match by `DisplayName`. Robust
+  to any Inno key-naming change.
+- **Donation surfaced.** Tray context menu now has a bold "❤  Fer un
+  donatiu" entry promoted above Quit. Onboarding gains a footer with
+  the same CTA (outlined teal button). Both point to the Stripe
+  payment link.
+- **Stripe link corrected.** `Strings.DonationUrl` was a placeholder
+  `freedolia.com/donate`. Now it's the real Stripe Payment Link
+  shared with the FreeWisp landing flow:
+  `https://donate.stripe.com/6oUcN559jeWpcDZ8eMfYY04`.
+- **SmartScreen pre-warning on landing.** Each landing (`/ca/`, `/es/`,
+  `/en/`) shows a small note below the download button explaining
+  "Windows protected your PC → More info → Run anyway", because we
+  don't carry a paid code-signing certificate. Same teal `--accent`
+  styling.
+- **Lead-capture flow documented.** `web/HANDOVER.md` section 5 spells
+  out the same pattern as FreeWisp: email modal → `public.leads` row
+  with `product='freezshot'` → R2 download → donation message on the
+  thank-you page.
+
 ---
 
 ## Operational notes

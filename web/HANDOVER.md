@@ -63,7 +63,27 @@ productes), afegir entrada **"Freezshot"** apuntant al locale
 corresponent — al costat de "FreeWisp", amb el mateix estil de pill
 verd/teal que ja té FreeWisp.
 
-### 5. Routes API (ja existeixen, NO les canviïs)
+### 5. Lead capture + missatge de donació (igual que FreeWisp)
+
+Quan l'usuari clica el botó **Descarrega'l gratis** (o equivalents als
+3 idiomes) el flux ha de ser **exactament el mateix que el de FreeWisp**:
+
+1. Es mostra un modal demanant l'email (capturem el lead).
+2. Es desa a la mateixa taula `public.leads` de Supabase amb
+   `product = 'freezshot'`.
+3. Es redirigeix a `/api/freescreenshot/download` (que serveix
+   `Setup_Freezshot.exe` des de R2).
+4. A la pàgina de gràcies, **missatge de donació destacat** apuntant al
+   payment link de Stripe:
+   `https://donate.stripe.com/6oUcN559jeWpcDZ8eMfYY04`
+   (el mateix que utilitza el menú de safata de l'app per coherència).
+
+> **Important:** el mateix payment link s'usa des de l'app (menú safata
+> → "Fer un donatiu", onboarding footer, Settings → About). Si el
+> canvieu al landing, cal canviar-lo també a `Strings.cs` del repo
+> Freezshot — feu un PR enllaçant els dos commits.
+
+### 6. Routes API (ja existeixen, NO les canviïs)
 
 Aquestes rutes ja estaven creades per FreeScreenshot i es queden així
 perquè l'app instal·lada hi apunta. Els endpoints són estables:

@@ -155,3 +155,15 @@ Reference for token-based theming; informed the structure of
   mutex (otherwise `ApplicationException`).
 - **Open captures in our editor, never Paint.** `EditorWindow.OpenForFile`
   is the single entry point for "click a thumbnail / history item".
+- **Upgrade migration on install.** The Inno Setup `[Code]` section
+  enumerates `HKCU/HKLM\…\Uninstall\*` by `DisplayName="FreeScreenshot"`
+  to remove the previous brand's entries before installing Freezshot.
+  Match by DisplayName, not by AppId path — Inno's key naming includes
+  a trailing extra `}` that broke a literal-path approach.
+- **Donation URL is the Stripe Payment Link**, not the dashboard URL.
+  `Strings.DonationUrl` ships with the public payment link
+  (`donate.stripe.com/...`). Same link in the landing's thank-you
+  modal — keep the two in sync via PR comments cross-linking commits.
+- **SmartScreen note.** Until we pay for code signing, every landing
+  shows a pre-warning under the download button so users know to
+  click "More info → Run anyway".

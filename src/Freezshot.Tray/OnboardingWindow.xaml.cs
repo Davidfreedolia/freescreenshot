@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Windows;
 using Freezshot.Core.Config;
 using Freezshot.Core.Localization;
@@ -24,6 +25,18 @@ public partial class OnboardingWindow : Window
         Step3Body.Text    = Strings.T("onboarding.step3.body");
         DoneBtn.Content   = Strings.T("onboarding.done");
         SettingsBtn.Content = Strings.T("menu.settings");
+
+        DonateFooterText.Text          = Strings.T("onboarding.donate.hint");
+        OnboardingDonateBtn.Content    = Strings.T("onboarding.donate.cta");
+    }
+
+    private void OnOnboardingDonate(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(Strings.DonationUrl) { UseShellExecute = true });
+        }
+        catch { /* never block UX on a failed Open */ }
     }
 
     private void OnDone(object sender, RoutedEventArgs e)

@@ -6,7 +6,7 @@
 ; Outputs installer\dist\Setup_Freezshot.exe
 
 #define MyAppName        "Freezshot"
-#define MyAppVersion     "2.0.0"
+#define MyAppVersion     "2.1.0"
 #define MyAppPublisher   "Freedolia"
 #define MyAppURL         "https://freedolia.com"
 #define MyAppExeName     "Freezshot.exe"
@@ -53,6 +53,78 @@ RestartApplications=no
 
 ; The "How it works" wizard page (per-language).
 InfoBeforeFile=info-before-ca.txt
+
+; ---- Upgrade migration ------------------------------------------------------
+; Detect any previously installed FreeScreenshot (pre-rename) and run its
+; uninstaller silently before we install Freezshot. Otherwise users end up with
+; two entries in Add/Remove Programs and two copies on disk.
+[Code]
+const
+  UninstallRoot = 'Software\Microsoft\Windows\CurrentVersion\Uninstall';
+  OldDisplayName = 'FreeScreenshot';
+  OldInstallFolder = '\Programs\FreeScreenshot';
+
+procedure StripOrphanInstallFolder();
+var
+  sFolder: string;
+begin
+  sFolder := ExpandConstant('{localappdata}') + OldInstallFolder;
+  if DirExists(sFolder) then
+    DelTree(sFolder, True, True, True);
+end;
+
+// Walk Uninstall/* under a given root hive, look for entries whose DisplayName
+// matches OldDisplayName exactly. For each one: try to run its uninstaller
+// silently if the file still exists, then delete the registry subkey.
+procedure CleanRoot(RootKey: Integer);
+var
+  Names: TArrayOfString;
+  i: Integer;
+  KeyPath: string;
+  DisplayName: string;
+  UninstallString: string;
+  ResultCode: Integer;
+begin
+  if not RegGetSubkeyNames(RootKey, UninstallRoot, Names) then
+    Exit;
+
+  for i := 0 to GetArrayLength(Names) - 1 do
+  begin
+    KeyPath := UninstallRoot + '\' + Names[i];
+    DisplayName := '';
+    if RegQueryStringValue(RootKey, KeyPath, 'DisplayName', DisplayName) then
+    begin
+      if CompareText(DisplayName, OldDisplayName) = 0 then
+      begin
+        UninstallString := '';
+        if RegQueryStringValue(RootKey, KeyPath, 'UninstallString', UninstallString) then
+        begin
+          UninstallString := RemoveQuotes(UninstallString);
+          if (UninstallString <> '') and FileExists(UninstallString) then
+            Exec(UninstallString,
+              '/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /NOCANCEL',
+              '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+        end;
+        // Whether or not the uninstaller ran, wipe the key.
+        RegDeleteKeyIncludingSubkeys(RootKey, KeyPath);
+      end;
+    end;
+  end;
+end;
+
+procedure UninstallOldFs();
+begin
+  CleanRoot(HKCU);
+  CleanRoot(HKLM);
+  StripOrphanInstallFolder();
+end;
+
+procedure CurStepChanged(CurStep: TSetupStep);
+begin
+  if CurStep = ssInstall then
+    UninstallOldFs();
+end;
+
 
 [Languages]
 Name: "ca"; MessagesFile: "compiler:Languages\Catalan.isl"; InfoBeforeFile: "info-before-ca.txt"
