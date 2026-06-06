@@ -83,6 +83,25 @@ public partial class EditorWindow : Window
         CopyBtn.Content   = Strings.T("editor.copy");
         SaveBtn.Content   = Strings.T("editor.save");
         DimensionsText.Text = $"{_widthPx} × {_heightPx}";
+
+        PositionTopCenter();
+    }
+
+    /// <summary>
+    /// Open the editor pinned to the top of the work area, horizontally
+    /// centred — the same place Windows tools (Snipping Tool, etc.) pop up,
+    /// so the window lands in a predictable spot every time instead of
+    /// floating in the middle of whatever the user was looking at.
+    /// </summary>
+    private void PositionTopCenter()
+    {
+        var work = SystemParameters.WorkArea;
+        const double topMargin = 24;
+        Left = work.Left + Math.Max(0, (work.Width - Width) / 2);
+        Top  = work.Top + topMargin;
+        // If the window is taller than the screen, hug the top edge instead.
+        if (Top + Height > work.Bottom)
+            Top = Math.Max(work.Top, work.Bottom - Height);
     }
 
     private Tool CurrentTool =>
@@ -125,6 +144,22 @@ public partial class EditorWindow : Window
         }
     }
 
+    /// <summary>
+    /// Font size for the text tool. Reuses the stroke selector (Fi / Mitjà /
+    /// Gruixut) as a small / medium / large picker, scaled gently to the image
+    /// so text reads at a sane size instead of the huge glyphs the old fixed
+    /// 2.2%-of-width formula produced on full-screen captures.
+    /// </summary>
+    private double CurrentFontSize
+    {
+        get
+        {
+            var baseSize = Math.Clamp(_widthField * 0.012, 15, 26);
+            var factor = CurrentStroke <= 2 ? 0.7 : CurrentStroke >= 7 ? 1.5 : 1.0;
+            return Math.Round(baseSize * factor);
+        }
+    }
+
     private void OnCanvasDown(object sender, MouseButtonEventArgs e)
     {
         _start = e.GetPosition(OverlayCanvas);
@@ -135,6 +170,9 @@ public partial class EditorWindow : Window
     private void OnCanvasMove(object sender, MouseEventArgs e)
     {
         if (!_drawing) return;
+        // Text is placed on mouse-up (click or drag-to-set-width); no live
+        // preview — a TextBox isn't something you want re-created every frame.
+        if (CurrentTool == Tool.Text) return;
         var p = e.GetPosition(OverlayCanvas);
         if (_preview is not null) OverlayCanvas.Children.Remove(_preview);
         _preview = BuildShape(_start, p);
@@ -158,6 +196,20 @@ public partial class EditorWindow : Window
             var w = Math.Abs(p.X - _start.X);
             var h = Math.Abs(p.Y - _start.Y);
             if (w >= 10 && h >= 10) DoCrop(new Rect(x, y, w, h));
+            return;
+        }
+
+        // Text: a plain click drops a default-width box; dragging sets its width.
+        // The box wraps and grows downward, so long text never gets clipped.
+        if (CurrentTool == Tool.Text)
+        {
+            var atX = Math.Min(_start.X, p.X);
+            var atY = Math.Min(_start.Y, p.Y);
+            var dragW = Math.Abs(p.X - _start.X);
+            if (dragW < 40) { atX = _start.X; atY = _start.Y; dragW = 320; }
+            var tb = CreateTextBox(new Point(atX, atY), dragW);
+            OverlayCanvas.Children.Add(tb);
+            _shapes.Push(tb);
             return;
         }
 
@@ -358,39 +410,52 @@ public partial class EditorWindow : Window
                 return dashed;
             }
             case Tool.Text:
-            {
-                if (Math.Abs(b.X - a.X) < 24 || Math.Abs(b.Y - a.Y) < 14)
-                    return null;
-                var tb = new System.Windows.Controls.TextBox
-                {
-                    Width = Math.Abs(b.X - a.X),
-                    MinWidth = 60,
-                    Background = Brushes.Transparent,
-                    Foreground = brush,
-                    BorderThickness = new Thickness(0),
-                    Padding = new Thickness(0),
-                    FontWeight = FontWeights.SemiBold,
-                    FontSize = Math.Max(16, _widthPx * 0.022),
-                    Text = Strings.T("editor.text.placeholder"),
-                    AcceptsReturn = false,
-                    SnapsToDevicePixels = true,
-                    UseLayoutRounding = true,
-                };
-                // Subtle dark shadow so light text reads on any background.
-                tb.Effect = new System.Windows.Media.Effects.DropShadowEffect
-                {
-                    Color = Color.FromRgb(0, 0, 0),
-                    BlurRadius = 6,
-                    ShadowDepth = 0,
-                    Opacity = 0.6,
-                };
-                System.Windows.Controls.Canvas.SetLeft(tb, Math.Min(a.X, b.X));
-                System.Windows.Controls.Canvas.SetTop(tb,  Math.Min(a.Y, b.Y));
-                tb.Loaded += (_, _) => { tb.Focus(); tb.SelectAll(); };
-                return tb;
-            }
+                // Handled in OnCanvasUp via CreateTextBox (no drag preview).
+                return null;
         }
         return null;
+    }
+
+    /// <summary>
+    /// Build an editable text box for the text tool. Wraps, accepts newlines
+    /// and auto-grows in height, so text is never clipped however long it gets.
+    /// Width comes from the drag (clamped to the image); height is free.
+    /// </summary>
+    private System.Windows.Controls.TextBox CreateTextBox(Point at, double width)
+    {
+        var brush = CurrentColor;
+        var maxW = Math.Max(80, _widthField - at.X - 8);
+        var tb = new System.Windows.Controls.TextBox
+        {
+            Width = Math.Clamp(width, 80, maxW),
+            MaxWidth = maxW,
+            Background = Brushes.Transparent,
+            Foreground = brush,
+            CaretBrush = brush,
+            BorderThickness = new Thickness(0),
+            Padding = new Thickness(2, 1, 2, 1),
+            FontWeight = FontWeights.SemiBold,
+            FontSize = CurrentFontSize,
+            Text = string.Empty,
+            AcceptsReturn = true,
+            TextWrapping = TextWrapping.Wrap,
+            HorizontalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Disabled,
+            VerticalScrollBarVisibility = System.Windows.Controls.ScrollBarVisibility.Disabled,
+            SnapsToDevicePixels = true,
+            UseLayoutRounding = true,
+        };
+        // Subtle dark shadow so light text reads on any background.
+        tb.Effect = new System.Windows.Media.Effects.DropShadowEffect
+        {
+            Color = Color.FromRgb(0, 0, 0),
+            BlurRadius = 6,
+            ShadowDepth = 0,
+            Opacity = 0.6,
+        };
+        System.Windows.Controls.Canvas.SetLeft(tb, at.X);
+        System.Windows.Controls.Canvas.SetTop(tb, at.Y);
+        tb.Loaded += (_, _) => tb.Focus();
+        return tb;
     }
 
     private void OnUndo(object sender, RoutedEventArgs e)

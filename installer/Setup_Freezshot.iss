@@ -6,7 +6,7 @@
 ; Outputs installer\dist\Setup_Freezshot.exe
 
 #define MyAppName        "Freezshot"
-#define MyAppVersion     "2.1.0"
+#define MyAppVersion     "2.2.0"
 #define MyAppPublisher   "Freedolia"
 #define MyAppURL         "https://freedolia.com"
 #define MyAppExeName     "Freezshot.exe"

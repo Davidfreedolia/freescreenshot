@@ -119,9 +119,12 @@ Reference for token-based theming; informed the structure of
 
 ## Build & release dependencies
 
-- **.NET 8 SDK** — installed at `C:\Users\David\.dotnet\dotnet.exe`
-  (NOT `C:\Program Files\dotnet\dotnet.exe` — that one only ships the
-  runtime).
+- **.NET 8 SDK** — as of v2.2 installed at `C:\Program Files\dotnet`
+  (SDK `8.0.421`), put there by `winget install Microsoft.DotNet.SDK.8`.
+  Heads-up: the older `C:\Users\David\.dotnet\dotnet.exe` is on PATH but
+  ships **runtime only** (`dotnet --list-sdks` returns empty), so plain
+  `dotnet build` from a fresh shell can fail with "No .NET SDKs were
+  found" — call the Program Files `dotnet.exe` explicitly, or fix PATH.
 - **Inno Setup 6** — at `%LOCALAPPDATA%\Programs\Inno Setup 6\ISCC.exe`.
 - **Node + Wrangler** — Cloudflare R2 uploads, invoked via the cached
   npx path at `…\npm-cache\_npx\…\node_modules\wrangler\bin\wrangler.js`.

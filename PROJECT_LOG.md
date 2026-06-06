@@ -248,6 +248,39 @@ of `AGENTS.md` for the checklist.
 
 ---
 
+## v2.2 — Editor text tool rework + fixed editor placement
+
+Two usability fixes in the post-capture editor
+(`src/Freezshot.Tray/Capture/EditorWindow`), both reported from real use.
+
+- **Text tool was barely usable.** The old text element was single-line
+  (`AcceptsReturn=false`), never wrapped, and used a fixed
+  `FontSize = width × 0.022` — on a 1920px capture that's ~42px, so
+  glyphs were huge and long text ran off the box and got clipped on
+  render. Reworked:
+  - New `CreateTextBox(at, width)` helper. The box now wraps
+    (`TextWrapping.Wrap`), accepts newlines (`AcceptsReturn=true`) and
+    auto-grows in height, so text can never be clipped.
+  - Font size is sane and adjustable: new `CurrentFontSize` reuses the
+    stroke selector (Fi / Mitjà / Gruixut) as a small / medium / large
+    picker, clamped to `width × 0.012` in the 15–26px range × {0.7,1,1.5}.
+  - Placement is click-to-drop (or drag to set width) on mouse-up;
+    no more flickering live preview that re-created a TextBox each frame.
+    `OnCanvasMove` early-returns for the text tool; `OnCanvasUp` builds it.
+- **Editor now opens top-centre, like Windows tools.** Was
+  `WindowStartupLocation="CenterScreen"`, which dropped the window over
+  whatever you were looking at. Now `Manual` + `PositionTopCenter()`:
+  horizontally centred on the work area, 24px from the top, clamped so a
+  too-tall window hugs the top edge. Applies to both new captures and
+  "open existing capture" (both go through the `EditorWindow` ctor).
+
+**Env note for future agents:** this machine had only the .NET *runtime*,
+no SDK — `dotnet build` failed until `winget install Microsoft.DotNet.SDK.8`
+(installed 8.0.421). Build then succeeded (0 errors; the lone WFAC010 DPI
+manifest warning is pre-existing and unrelated).
+
+---
+
 ## Operational notes
 
 - **Build:** `dotnet publish` self-contained single-file

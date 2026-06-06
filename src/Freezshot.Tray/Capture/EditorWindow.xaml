@@ -4,7 +4,7 @@
         Title="Freezshot — Editor"
         Width="1040" Height="740"
         MinWidth="720" MinHeight="500"
-        WindowStartupLocation="CenterScreen"
+        WindowStartupLocation="Manual"
         Background="{DynamicResource Brush.Bg.Base}"
         FontFamily="{DynamicResource Font.Ui}"
         Foreground="{DynamicResource Brush.Text.Primary}"
